@@ -14,12 +14,35 @@ function Landing(props) {
       alert('Please select a file');
   }
 
-  // usedragAndDropArea(() => {
+  const sendData = data => {
+    
+    setFileSelected(true);
+
+    props.sendOjb3dToParent(data);
+
+    var bodyFormData = new FormData();
+    bodyFormData.append('name', 'obj');
+    bodyFormData.append('obj3d', data); 
+    axios({
+      "method": "POST",
+      "url": "http://localhost:3001/upload3d",
+      "data": bodyFormData,
+      "headers": {'Content-Type': 'multipart/form-data' }
+    })
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+
+  }
+
   const dragAndDropArea = event => {
 
     let dropArea = document.getElementById('drop-area')
-    //let uploadProgress = [] // track the percentage completion of each request instead of just how many are done
-    //let progressBar = document.getElementById('progress-bar')
+    let uploadProgress = [] // track the percentage completion of each request instead of just how many are done
+    let progressBar = document.getElementById('progress-bar')
     
     // Prevent default drag behaviours, otherwise the browser will end up opening the dropped file instead of sending it along to the drop event handler!
 
@@ -64,50 +87,42 @@ function Landing(props) {
     
     function handleFiles(files) {
       files = [...files]
-      //initializeProgress(files.length)
+      initializeProgress(files.length)
       files.forEach(uploadFile)
-      //files.forEach(previewFile)
     }
 
     function uploadFile(file, i) {
-      //var url = 'YOUR URL HERE' // TODO: change the URL to work with the back-end or service
+      //var url = 'YOUR URL HERE' // change the URL to work with the back-end or service
       var url = 'https://api.cloudinary.com/v1_1/magdalena/image/upload' // to test with a free cloudinary account (works only for images, not for ply files)
       var xhr = new XMLHttpRequest() // to support Internet Explorer
       var formData = new FormData()
       xhr.open('POST', url, true)
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
       
-      /*// Update progress (can be used to show progress indicator)
+      // TODO: the progress bar will then show how much it takes to upload it to a cloud, but not to our server, it will still be very fast, so could be still used for showing an approximate time
+      // Update progress (can be used to show progress indicator)
       xhr.upload.addEventListener("progress", function(e) {
-      updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
+        updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
       })
 
       xhr.addEventListener('readystatechange', function(e) {
-      // TODO: Depending on how the server is set up, different ranges of status numbers rather than just 200 may also be checked
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        updateProgress(i, 100)
-        // Done. Inform the user
-      }
-      else if (xhr.readyState === 4 && xhr.status !== 200) {
-        // Error. Inform the user
-      }
-      })*/
+        // Depending on how the server is set up, different ranges of status numbers rather than just 200 may also be checked
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          updateProgress(i, 100)
+          // Done. Inform the user
+        }
+        else if (xhr.readyState === 4 && xhr.status !== 200) {
+          // Error. Inform the user
+        }
+      })
 
       formData.append('upload_preset', 'pworvx7a') // preset name: pworvx7a, ml_default
       formData.append('file', file) // update, if the server needs more information
       xhr.send(formData)
-    }
-    
-    /*// Image Preview
-    
-    function previewFile(file) {
-      let reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onloadend = function() {
-      let img = document.createElement('img')
-      img.src = reader.result
-      document.getElementById('gallery').appendChild(img)
-      }
+
+      // Send (NEW)
+      sendData(file);
+
     }
     
     // Tracking Progress
@@ -126,41 +141,17 @@ function Landing(props) {
       let total = uploadProgress.reduce((tot, curr) => tot + curr, 0) / uploadProgress.length
       console.debug('update', fileNumber, percent, total)
       progressBar.value = total
-    }*/
+    }
 
-    setFileSelected(true);
-
-  //},[dropArea])
   }
 
   //When file selected, post it to server
   const onChangeHandler = event => {
-
-    const selected3dObj = event.target.files[0];
-    setFileSelected(true);
-
-    props.sendOjb3dToParent(selected3dObj);
-
-    var bodyFormData = new FormData();
-    bodyFormData.append('name', 'obj');
-    bodyFormData.append('obj3d', selected3dObj); 
-    axios({
-      "method": "POST",
-      "url": "http://localhost:3001/upload3d",
-      "data": bodyFormData,
-      "headers": {'Content-Type': 'multipart/form-data' }
-    })
-    .then((response) => {
-      console.log(response)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-
+    sendData(event.target.files[0]);
   }
 
   const getStarted = event => {
-    // TODO
+    // TODO: maybe better to make a third separate page, where only the button is shown
   }
 
   return (
@@ -168,36 +159,56 @@ function Landing(props) {
       <video autoPlay muted loop id="video">
           <source src={backgroundVideo} type="video/mp4" />
       </video> 
-
-      {/*<input type="file" name="file" accept=".ply,.obj"onChange={onChangeHandler}/>*/}
+      {/*<input type="file" name="file" accept=".ply"onChange={onChangeHandler}/>*/}
 
       <Button fullWidth variant="outlined" color="secondary" onClick={btnClicked}> go to 1 </Button>
 
-      <div className="container">
-        <div className="center">
+      {/*<div className="container">
+        <div className="center">*/}
           {/*<a  href="#get-started" className="button">GET STARTED</a>*/}
-          <form className="my-form">
+          {/*<form className="my-form">
             <input type="button" name="start" id="get-started" onChange={getStarted}/>
             <label className="button" htmlFor="get-started">GET STARTED</label>
           </form>
         </div>
-      </div>
+      </div>*/}
 
       <div id="drop-area">
         <Button color="secondary" onClick={dragAndDropArea}> activate </Button>
         <form className="my-form">
-          <p>Upload a 3D object ( one ply file ) with the file dialog or by dragging and dropping onto the dashed region</p>
-          {/*<input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)"></input>*/}
-          <input type="file" name="file" id="fileElem" accept=".ply" onChange={onChangeHandler}/>
+          <br /><br /><p>Upload a 3D object ( one ply file )<br />with the file dialog or<br />by dragging and dropping onto the dashed region</p>
+          <br /><input type="file" name="file" id="fileElem" accept=".ply,.obj" onChange={onChangeHandler}/>
           <label className="button" htmlFor="fileElem">Select a file</label>
+          <br /><br /><progress id="progress-bar" max="100" value="0"></progress>
         </form>
-        {/*<progress id="progress-bar" max=100 value=0></progress>
-        <div id="gallery"></div>*/}
       </div>
 
       <div className="container">
         <div className="center">
-          <h3 color="white">Set The Parameters</h3>
+          <h3 className="set-parameters">Parameters</h3>
+        </div>
+      </div>
+
+      {/* TODO: The three parameters should be also send! */}
+      <div className="container">
+        <div className="center set-parameters">
+          Amount of by blender generated images:&nbsp;
+          <input className="form-control" type="number"/>&nbsp;
+          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Put information here..">Info</span>
+        </div>
+      </div>
+      <div className="container">
+        <div className="center set-parameters">
+          Amount of real images:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <input className="form-control" type="number"/>&nbsp;
+          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Put information here..">Info</span>
+        </div>
+      </div>
+      <div className="container">
+        <div className="center set-parameters">
+          "Training data / test data" - relation:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <input className="form-control" type="text"/>&nbsp;
+          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Put information here..">Info</span>
         </div>
       </div>
 
