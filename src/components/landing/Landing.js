@@ -171,7 +171,7 @@ function Landing(props) {
 
       {/*<input type="file" name="file" accept=".ply,.obj"onChange={onChangeHandler}/>*/}
 
-      <Button fullWidth variant="outlined" color="secondary" onClick={btnClicked}> go to 1 </Button>
+      <Button fullWidth variant="outlined" color="secondary" onClick={btnClicked}> To workspace </Button>
 
       <div className="container">
         <div className="center">
