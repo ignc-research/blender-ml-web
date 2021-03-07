@@ -1,5 +1,5 @@
 #video {
-  position: absolute;
+  position: fixed;
   z-index: -1;
   width: 100%;
   object-fit: cover;
@@ -77,4 +77,8 @@
 
 .tooltip {
   color: red;
+}
+
+#progress-bar {
+  display:none;
 }

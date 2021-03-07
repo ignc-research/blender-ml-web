@@ -6,17 +6,24 @@ import axios from 'axios';
 
 function Landing(props) {
   const [fileSelected, setFileSelected] = useState(false);
+  const [fileName, setfileName] = useState('');
 
-  const btnClicked = () => {
+  /* TODO Question: What happens with the data when swtching back from 1 to 0? */
+  const btnClickedNext = () => {
     if(fileSelected)
-      props.stepChanged(1);
+      props.stepChanged(1); // Switch to the working space.
     else
       alert('Please select a file');
+  }
+
+  const btnClickedPrev =() => {
+    props.stepChanged(-1); // SWitch back to the initial page.
   }
 
   const sendData = data => {
     
     setFileSelected(true);
+    setfileName(data.name)
 
     props.sendOjb3dToParent(data);
 
@@ -99,7 +106,7 @@ function Landing(props) {
       xhr.open('POST', url, true)
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
       
-      // TODO: the progress bar will then show how much it takes to upload it to a cloud, but not to our server, it will still be very fast, so could be still used for showing an approximate time
+      // TODO: The progress bar will then show how much it takes to upload it to a cloud, but not to our server, it will still be very fast, so could be still used for showing an approximate time.
       // Update progress (can be used to show progress indicator)
       xhr.upload.addEventListener("progress", function(e) {
         updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
@@ -150,36 +157,26 @@ function Landing(props) {
     sendData(event.target.files[0]);
   }
 
-  const getStarted = event => {
-    // TODO: maybe better to make a third separate page, where only the button is shown
-  }
-
   return (
     <div className="Landing">
       <video autoPlay muted loop id="video">
           <source src={backgroundVideo} type="video/mp4" />
-      </video> 
+      </video>
       {/*<input type="file" name="file" accept=".ply"onChange={onChangeHandler}/>*/}
 
-      <Button fullWidth variant="outlined" color="secondary" onClick={btnClicked}> go to 1 </Button>
-
-      {/*<div className="container">
-        <div className="center">*/}
-          {/*<a  href="#get-started" className="button">GET STARTED</a>*/}
-          {/*<form className="my-form">
-            <input type="button" name="start" id="get-started" onChange={getStarted}/>
-            <label className="button" htmlFor="get-started">GET STARTED</label>
-          </form>
-        </div>
-      </div>*/}
+      <Button fullWidth variant="outlined" color="secondary" onClick={btnClickedNext}> go to workspace </Button>
+      <Button fullWidth variant="outlined" color="secondary" onClick={btnClickedPrev}> go back to the beginning </Button>
 
       <div id="drop-area">
-        <Button color="secondary" onClick={dragAndDropArea}> activate </Button>
         <form className="my-form">
-          <br /><br /><p>Upload a 3D object ( one ply file )<br />with the file dialog or<br />by dragging and dropping onto the dashed region</p>
+          <br /><br /><p>Upload a 3D object ( one ply file )<br /><br />with the file dialog or<br />
+          <Button color="secondary" onClick={dragAndDropArea}> activate </Button><br />
+          the drag and drop behavior for the dashed region</p>
           <br /><input type="file" name="file" id="fileElem" accept=".ply,.obj" onChange={onChangeHandler}/>
           <label className="button" htmlFor="fileElem">Select a file</label>
+          &nbsp;{fileName}
           <br /><br /><progress id="progress-bar" max="100" value="0"></progress>
+          {/* TODO: A progress bar with our service! For now it is hided. The progress bar should be also working with the file dialog. */}
         </form>
       </div>
 
@@ -193,22 +190,22 @@ function Landing(props) {
       <div className="container">
         <div className="center set-parameters">
           Amount of by blender generated images:&nbsp;
-          <input className="form-control" type="number"/>&nbsp;
-          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Put information here..">Info</span>
+          <input className="form-control" type="number" min="0"/>&nbsp;
+          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of by blender generated images to an integer number bigger or equal to zero.">Info</span>
         </div>
       </div>
       <div className="container">
         <div className="center set-parameters">
           Amount of real images:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input className="form-control" type="number"/>&nbsp;
-          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Put information here..">Info</span>
+          <input className="form-control" type="number" min="0"/>&nbsp;
+          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of real images to an integer number bigger or equal to zero.">Info</span>
         </div>
       </div>
       <div className="container">
         <div className="center set-parameters">
           "Training data / test data" - relation:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <input className="form-control" type="text"/>&nbsp;
-          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Put information here..">Info</span>
+          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="The relation between the training data and the test data is expected. Please write it in the form '<training_data>/<test_data>'. For example '80/20'.">Info</span>
         </div>
       </div>
 

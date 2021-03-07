@@ -1,10 +1,11 @@
+import Start from "./components/start/Start"
 import Landing from "./components/landing/Landing";
 import Workspace from "./components/workspace/Workspace";
 import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [step, setStep] = useState(0);  
+  const [step, setStep] = useState(-1);
   const stepChanged = (step) => {
     setStep(step);
   } 
@@ -17,6 +18,9 @@ function App() {
 
   return (
     <div className="App">
+      {step === -1 &&
+        <Start stepChanged={stepChanged}/>
+      }
       {step === 0 &&
         <Landing stepChanged={stepChanged} sendOjb3dToParent={setTheObj3dForWorkspace}/>
       }
