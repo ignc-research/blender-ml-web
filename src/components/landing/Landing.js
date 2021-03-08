@@ -172,7 +172,7 @@ function Landing(props) {
           <br /><br /><p>Upload a 3D object ( one ply file )<br /><br />with the file dialog or<br />
           <Button color="secondary" onClick={dragAndDropArea}> activate </Button><br />
           the drag and drop behavior for the dashed region</p>
-          <br /><input type="file" name="file" id="fileElem" accept=".ply,.obj" onChange={onChangeHandler}/>
+          <br /><input type="file" name="file" id="fileElem" accept=".ply" onChange={onChangeHandler}/>
           <label className="button" htmlFor="fileElem">Select a file</label>
           &nbsp;{fileName}
           <br /><br /><progress id="progress-bar" max="100" value="0"></progress>

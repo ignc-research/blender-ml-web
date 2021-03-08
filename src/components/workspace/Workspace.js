@@ -9,6 +9,12 @@ import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import MinMaxGUIHelper from '../../helpers/MinMaxGUIHelper';
 import axios from 'axios';
 
+import Button from '@material-ui/core/Button';
+// import { makeStyles } from '@material-ui/core/styles';
+// import Icon from '@material-ui/core/Icon';
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
+import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
+
 function Workspace(props) {
 
   useEffect(() => {
@@ -269,6 +275,8 @@ function Workspace(props) {
   }
 
   const initTrig = () => {
+    initData();
+
     var data = { 
       training : "start",
     }
@@ -292,10 +300,28 @@ function Workspace(props) {
  
   return (
     <div className="App">
-      workspace 
-      <button className="back" onClick={btnClicked} >go to 0</button>
-      <button id="sendData" onClick={initData} >Send Value</button>
-      <button id="sendTrig" onClick={initTrig} >Start Training</button>
+      <div class="nav">
+        <Button  
+          onClick={btnClicked} 
+          variant="contained"
+          color="primary"
+          // className={classes.button}
+          startIcon={<KeyboardBackspaceIcon  />}
+        >
+        Back
+        </Button>
+        <Button  
+          onClick={initTrig} 
+          variant="contained"
+          color="default"
+          // className={classes.button}
+          endIcon={<DoubleArrowIcon  />}
+        >
+        Start Training
+        </Button>
+      
+      </div>
+      
       <div id="gui-container"></div>
       {/* <button onClick={zoom} >zoom</button> */}
       <canvas id="c"></canvas>
