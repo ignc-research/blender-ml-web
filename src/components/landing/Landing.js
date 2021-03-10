@@ -10,9 +10,11 @@ function Landing(props) {
 
   /* TODO Question: What happens with the data when swtching back from 1 to 0? */
   const btnClickedNext = () => {
-    if(fileSelected)
+    // console.log(dataFields);
+    if(fileSelected){
+      setParameters();
       props.stepChanged(1); // Switch to the working space.
-    else
+    }else
       alert('Please select a file');
   }
 
@@ -43,6 +45,16 @@ function Landing(props) {
       console.log(error)
     })
 
+  }
+
+  //input parameters 
+  const [dataFields, setDataFields] = useState({numberOfRenders:0, train_test_split:0});
+  const onChangeFields = (name, e) => {
+    setDataFields({...dataFields,[name]:parseFloat(e.target.value)})
+  }
+
+  const setParameters = () => {
+    props.sendParamsToParent(dataFields);
   }
 
   const dragAndDropArea = event => {
@@ -190,7 +202,7 @@ function Landing(props) {
       <div className="container">
         <div className="center set-parameters">
           Amount of by blender generated images:&nbsp;
-          <input className="form-control" type="number" min="0"/>&nbsp;
+          <input value={dataFields.numberOfRenders} onChange={(e) => onChangeFields("numberOfRenders", e)} className="form-control" type="number" min="0"/>&nbsp;
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of by blender generated images to an integer number bigger or equal to zero.">Info</span>
         </div>
       </div>
@@ -204,7 +216,7 @@ function Landing(props) {
       <div className="container">
         <div className="center set-parameters">
           "Training data / test data" - relation:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input className="form-control" type="text"/>&nbsp;
+          <input value={dataFields.train_test_split} onChange={(e) => onChangeFields("train_test_split", e)} className="form-control" type="number"/>&nbsp;
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="The relation between the training data and the test data is expected. Please write it in the form '<training_data>/<test_data>'. For example '80/20'.">Info</span>
         </div>
       </div>

@@ -241,6 +241,7 @@ function Workspace(props) {
   }
 
   // console.log(camera.position.x);
+  console.log(props.objParams);
   const initData = () => {
 
 
@@ -251,6 +252,7 @@ function Workspace(props) {
         cam_incmax: maxPhi,
         cam_azimin: minTheta,
         cam_azimax: maxTheta,
+        ...props.objParams
     }
     //Node API test
     axios({
@@ -300,7 +302,7 @@ function Workspace(props) {
  
   return (
     <div className="App">
-      <div class="nav">
+      <div className="nav">
         <Button  
           onClick={btnClicked} 
           variant="contained"

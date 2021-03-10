@@ -15,6 +15,10 @@ function App() {
   const setTheObj3dForWorkspace = (obj3dFromLanding) => {
     setObj3d(obj3dFromLanding);
   } 
+  const [objParams, setObjParams] = useState(null);
+  const setPramsForWorkspace = (objParamsFromLanding) => {
+    setObjParams(objParamsFromLanding);
+  } 
 
   return (
     <div className="App">
@@ -22,10 +26,10 @@ function App() {
         <Start stepChanged={stepChanged}/>
       }
       {step === 0 &&
-        <Landing stepChanged={stepChanged} sendOjb3dToParent={setTheObj3dForWorkspace}/>
+        <Landing stepChanged={stepChanged} sendOjb3dToParent={setTheObj3dForWorkspace} sendParamsToParent={setPramsForWorkspace}/>
       }
       {step === 1 &&
-        <Workspace stepChanged={stepChanged} obj3d={obj3d}/>
+        <Workspace stepChanged={stepChanged} obj3d={obj3d} objParams={objParams}/>
       }
       
     </div>
