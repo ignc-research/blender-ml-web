@@ -80,7 +80,7 @@ function Workspace(props) {
     controls.minZoom = 0.05;
     controls.maxZoom = 0.5;
     controls.maxPolarAngle = Math.PI/2; 
-    controls.target.set(0, 5, 0);
+    controls.target.set(0, 0, 0);
     controls.update();
   
     const camera2 = new THREE.PerspectiveCamera(
@@ -90,10 +90,10 @@ function Workspace(props) {
       500, // far
     );
     camera2.position.set(16, 28, 40);
-    camera2.lookAt(0, 5, 0);
+    camera2.lookAt(0, 0, 0);
   
     const controls2 = new OrbitControls(camera2, view2Elem);
-    controls2.target.set(0, 5, 0);
+    controls2.target.set(0, 0, 0);
     controls2.update();
   
     const scene = new THREE.Scene();
@@ -101,26 +101,29 @@ function Workspace(props) {
     scene.add(cameraHelper);
   
     // Objects in scenes
-    {
-      const planeSize = 100;
+    // {
+    //   const planeSize = 100;
   
-      const loader = new THREE.TextureLoader();
-      const texture = loader.load('https://threejsfundamentals.org/threejs/resources/images/checker.png');
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.magFilter = THREE.NearestFilter;
-      const repeats = planeSize / 2;
-      texture.repeat.set(repeats, repeats);
+    //   const loader = new THREE.TextureLoader();
+    //   const texture = loader.load('https://threejsfundamentals.org/threejs/resources/images/checker.png');
+    //   texture.wrapS = THREE.RepeatWrapping;
+    //   texture.wrapT = THREE.RepeatWrapping;
+    //   texture.magFilter = THREE.NearestFilter;
+    //   const repeats = planeSize / 2;
+    //   texture.repeat.set(repeats, repeats);
   
-      const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
-      const planeMat = new THREE.MeshPhongMaterial({
-        map: texture,
-        side: THREE.DoubleSide,
-      });
-      const mesh = new THREE.Mesh(planeGeo, planeMat);
-      mesh.rotation.x = Math.PI * -.5;
-      scene.add(mesh);
-    }
+    //   const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
+    //   const planeMat = new THREE.MeshPhongMaterial({
+    //     map: texture,
+    //     side: THREE.DoubleSide,
+    //   });
+    //   const mesh = new THREE.Mesh(planeGeo, planeMat);
+    //   mesh.rotation.x = Math.PI * -.5;
+    //   mesh.position.x = 0;
+    //   mesh.position.y = 0;
+    //   mesh.position.z = 0;
+    //   scene.add(mesh);
+    // }
 
     // Load 3d object file 
       var file3d = props.obj3d;
@@ -132,8 +135,8 @@ function Workspace(props) {
           var geometry = loader.parse(this.result);
           var material = new THREE.MeshPhongMaterial( { color: 0x0055ff, flatShading: true } );
           const mesh = new THREE.Mesh(geometry, material);
-          mesh.position.x = 5
-          mesh.position.y = 2;
+          mesh.position.x = 0;
+          mesh.position.y = 0;
           mesh.position.z = 0;
           // mesh.rotation.x = - Math.PI / 2;
 
@@ -158,6 +161,14 @@ function Workspace(props) {
       light.target.position.set(-5, 0, 0);
       scene.add(light);
       scene.add(light.target);
+    }
+    {
+      var axes = new THREE.AxisHelper(50);
+      scene.add(axes);
+    }
+    {
+      var gridXZ = new THREE.GridHelper(100, 100);
+      scene.add(gridXZ);
     }
     
     // resize renderer to screen
@@ -214,7 +225,7 @@ function Workspace(props) {
         // don't draw the camera helper in the original view
         cameraHelper.visible = false;
   
-        scene.background.set(0x000000);
+        scene.background.set(0xf1f2f4);
         renderer.render(scene, camera);
       }
   
@@ -229,7 +240,7 @@ function Workspace(props) {
         // draw the camera helper in the 2nd view
         cameraHelper.visible = true;
   
-        scene.background.set(0x000040);
+        scene.background.set(0x17191e);
         
         renderer.render(scene, camera2);
       }
