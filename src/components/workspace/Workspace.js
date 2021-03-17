@@ -21,7 +21,6 @@ function Workspace(props) {
     initThree();
     
   });
-
   console.log("im in work space")
   console.log(props.obj3d)
   console.log("im in work space")
@@ -51,6 +50,12 @@ function Workspace(props) {
   var maxTheta = maxSpherical.theta;
 
   const initThree = () => {
+
+    // const [btnDisabled, setBtnDisabled] = useState(true)
+    //React.state = {
+    //  disabled: true
+    //}
+
     const canvas = document.querySelector('#c');
     const view1Elem = document.querySelector('#view1');
     const view2Elem = document.querySelector('#view2');
@@ -101,7 +106,7 @@ function Workspace(props) {
     scene.add(cameraHelper);
   
     // Objects in scenes
-    {
+    {        
       const planeSize = 100;
   
       const loader = new THREE.TextureLoader();
@@ -276,16 +281,16 @@ function Workspace(props) {
     props.stepChanged(0);
   }
 
-  const initTrig = () => {
+  const initRenderTrig = () => {
     initData();
 
     var data = { 
-      training : "start",
+      start : "rendering",
     }
     //Node API test
     axios({
       "method": "POST",
-      "url": "http://localhost:3001/receivetrigger",
+      "url": "http://localhost:3001/receiverendertrigger",
       "headers": {
         
       }, "params": {
@@ -299,11 +304,35 @@ function Workspace(props) {
       console.log(error)
     })
   }
- 
+
+  const initTrainTrig = () => {
+    
+    var data = { 
+      start : "training",
+    }
+    //Node API test
+    axios({
+      "method": "POST",
+      "url": "http://localhost:3001/receivetraintrigger",
+      "headers": {
+        
+      }, "params": {
+        "myData": data
+      }
+    })
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
   return (
     <div className="App">
       <div className="nav">
-        <Button  
+        <Button 
+          id="back"
           onClick={btnClicked} 
           variant="contained"
           color="primary"
@@ -312,10 +341,22 @@ function Workspace(props) {
         >
         Back
         </Button>
-        <Button  
-          onClick={initTrig} 
+        <Button
+          id="ren"   
+          onClick={initRenderTrig} 
           variant="contained"
           color="default"
+          // className={classes.button}
+          endIcon={<DoubleArrowIcon  />}
+        >
+        Start Rendering
+        </Button>
+        <Button
+          id="train"  
+          onClick={initTrainTrig} 
+          variant="contained"
+          color="default"
+          // disabled={React.state.disabled}
           // className={classes.button}
           endIcon={<DoubleArrowIcon  />}
         >
@@ -323,7 +364,7 @@ function Workspace(props) {
         </Button>
       
       </div>
-      
+
       <div id="gui-container"></div>
       {/* <button onClick={zoom} >zoom</button> */}
       <canvas id="c"></canvas>
