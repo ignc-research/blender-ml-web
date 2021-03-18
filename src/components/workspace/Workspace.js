@@ -21,14 +21,20 @@ function Workspace(props) {
     initThree();
     
   });
-  console.log("im in work space")
-  console.log(props.obj3d)
-  console.log("im in work space")
 
-  const size = 1;
+  // console.log("im in work space")
+  // console.log(props.obj3d)
+  // console.log("im in work space")
+
+  // const size = 1;
+  // const near = 1;
+  // const far = 1000;
+  // const camera = new THREE.OrthographicCamera(-size, size, size, -size, near, far);
+  const fov = 45;
+  const aspect = 2;  // the canvas default
   const near = 5;
   const far = 50;
-  const camera = new THREE.OrthographicCamera(-size, size, size, -size, near, far);
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
   const xmin = -40;
   const xmax = 40;
@@ -61,32 +67,45 @@ function Workspace(props) {
     const view2Elem = document.querySelector('#view2');
     const renderer = new THREE.WebGLRenderer({canvas});
       
-    camera.zoom = 0.2;
-    camera.position.set(0, 10, 20);
+    // camera.zoom = 0.05;
+    camera.position.set(0, 10, 34);
     const cameraHelper = new THREE.CameraHelper(camera);
   
-    const gui = new GUI({ autoPlace: false });
-    const cameraFolder = gui.addFolder("Camera view");
-    cameraFolder.add(camera, 'zoom', 0.05, 0.5, 0.01).listen();
-    const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
-    cameraFolder.add(minMaxGUIHelper, 'min', 1, 50, 0.1).name('near');
-    cameraFolder.add(minMaxGUIHelper, 'max', 1, 50, 0.1).name('far');
-    // cameraFolder.open()
+    // const gui = new GUI({ autoPlace: false });
+    // const cameraFolder = gui.addFolder("Camera view");
+    // cameraFolder.add(camera, 'zoom', 0.05, 0.5, 0.01).listen();
+    // const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+    // cameraFolder.add(minMaxGUIHelper, 'min', 1, 50, 0.1).name('near');
+    // cameraFolder.add(minMaxGUIHelper, 'max', 1, 50, 0.1).name('far');
+    // // cameraFolder.open()
 
-    const coordinateFolder = gui.addFolder("Coordinates");
-    coordinateFolder.add(camera.position, "x", xmin, xmax, 0.01);
-    coordinateFolder.add(camera.position, "y", ymin, ymax, 0.01);
-    coordinateFolder.add(camera.position, "z", zmin, zmax, 0.01);
-    // coordinateFolder.open()
-    var guiContainer = document.getElementById('gui-container');
-    guiContainer.appendChild(gui.domElement);
+    // const coordinateFolder = gui.addFolder("Coordinates");
+    // coordinateFolder.add(camera.position, "x", xmin, xmax, 0.01);
+    // coordinateFolder.add(camera.position, "y", ymin, ymax, 0.01);
+    // coordinateFolder.add(camera.position, "z", zmin, zmax, 0.01);
+    // // coordinateFolder.open()
+    // var guiContainer = document.getElementById('gui-container');
+    // guiContainer.appendChild(gui.domElement);
 
-    const controls = new OrbitControls(camera, view1Elem);
-    controls.minZoom = 0.05;
-    controls.maxZoom = 0.5;
-    controls.maxPolarAngle = Math.PI/2; 
-    controls.target.set(0, 5, 0);
-    controls.update();
+    // const controls = new OrbitControls(camera, view1Elem);
+    // controls.minZoom = 0.05;
+    // controls.maxZoom = 0.5;
+    // controls.maxPolarAngle = Math.PI/2; 
+    // controls.target.set(0, 0, 0);
+    // controls.update();
+    
+    // const cameraFolder = gui.addFolder("Camera view");
+    // gui.add(camera, 'fov', 1, 180);
+    // const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+    // cameraFolder.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near');
+    // cameraFolder.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
+    
+
+  
+    // const controls = new OrbitControls(camera, view1Elem);
+    // controls.maxPolarAngle = Math.PI/2; 
+    // controls.target.set(0, 0, 0);
+    // controls.update();
   
     const camera2 = new THREE.PerspectiveCamera(
       60,  // fov
@@ -94,19 +113,67 @@ function Workspace(props) {
       0.1, // near
       500, // far
     );
-    camera2.position.set(16, 28, 40);
-    camera2.lookAt(0, 5, 0);
+    camera2.position.set(0, 10, 34);
+    camera2.lookAt(0, 0, 0);
   
     const controls2 = new OrbitControls(camera2, view2Elem);
-    controls2.target.set(0, 5, 0);
+    controls2.target.set(0, 0, 0);
     controls2.update();
   
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('black');
     scene.add(cameraHelper);
-  
-    // Objects in scenes
-    {        
+    
+    var objRadius = 1;
+    const objGeometry = new THREE.SphereGeometry( objRadius, 32, 32 );
+    const objMaterial = new THREE.MeshBasicMaterial( { color: 0xffc000, wireframe: true, transparent: true } );
+    const objSphereBound = new THREE.Mesh( objGeometry, objMaterial );
+    objSphereBound.position.set(0, 0, 0);
+    scene.add( objSphereBound );
+    // console.log(objSphereBound);
+
+    var cameraRadius = 1;
+    const cameraGeometry = new THREE.SphereGeometry( cameraRadius, 32, 32 );
+    const cameraMaterial = new THREE.MeshBasicMaterial( { color: 0xdfe3ee, wireframe: true, transparent: true,opacity: 0.25 } );
+    const cameraSphereBound = new THREE.Mesh( cameraGeometry, cameraMaterial );
+    cameraSphereBound.position.set(0, 0, 0);
+    scene.add( cameraSphereBound );
+    // console.log(cameraSphereBound);
+
+    const gui = new GUI();
+
+    const radiusFolder = gui.addFolder('Set Radius');
+    radiusFolder.add(objSphereBound.geometry.parameters, 'radius', 0, 30).name('Min Radius').onChange(function () {
+      objRadius = objSphereBound.geometry.parameters.radius;
+      objSphereBound.scale.x = objRadius;
+      objSphereBound.scale.y = objRadius;
+      objSphereBound.scale.z = objRadius;
+    });
+    radiusFolder.add(cameraSphereBound.geometry.parameters, 'radius', 0, 50).name('Max Radius').onChange(function () {
+      cameraRadius = cameraSphereBound.geometry.parameters.radius;
+      cameraSphereBound.scale.x = cameraRadius;
+      cameraSphereBound.scale.y = cameraRadius;
+      cameraSphereBound.scale.z = cameraRadius;
+
+      camera.position.z = cameraRadius;
+    });
+    radiusFolder.open();
+
+    const coordinateFolder = gui.addFolder("Coordinates");
+    coordinateFolder.add(camera.position, "x", xmin, xmax, 0.01);
+    coordinateFolder.add(camera.position, "y", ymin, ymax, 0.01);
+    coordinateFolder.add(camera.position, "z", zmin, zmax, 0.01);
+
+    const rotationFolder = gui.addFolder("Rotation");
+    rotationFolder.add(camera.rotation, "x", -Math.PI * 2, Math.PI * 2, 0.01);
+    rotationFolder.add(camera.rotation, "y", -Math.PI * 2, Math.PI * 2, 0.01);
+
+
+    // coordinateFolder.open()
+    var guiContainer = document.getElementById('gui-container');
+    guiContainer.appendChild(gui.domElement);
+    
+    {
       const planeSize = 100;
   
       const loader = new THREE.TextureLoader();
@@ -122,9 +189,12 @@ function Workspace(props) {
         map: texture,
         side: THREE.DoubleSide,
       });
-      const mesh = new THREE.Mesh(planeGeo, planeMat);
-      mesh.rotation.x = Math.PI * -.5;
-      scene.add(mesh);
+      var plane = new THREE.Mesh(planeGeo, planeMat);
+      plane.rotation.x = Math.PI * -.5;
+      plane.position.x = 0;
+      plane.position.y = 0;
+      plane.position.z = 0;
+      scene.add(plane);
     }
 
     // Load 3d object file 
@@ -137,16 +207,16 @@ function Workspace(props) {
           var geometry = loader.parse(this.result);
           var material = new THREE.MeshPhongMaterial( { color: 0x0055ff, flatShading: true } );
           const mesh = new THREE.Mesh(geometry, material);
-          mesh.position.x = 5
-          mesh.position.y = 2;
+          mesh.position.x = 0;
+          mesh.position.y = 0;
           mesh.position.z = 0;
           // mesh.rotation.x = - Math.PI / 2;
 
           var multiplier = 5/mesh.geometry.boundingSphere.radius;
 
-          console.log(mesh);
+          // console.log(mesh);
           mesh.scale.multiplyScalar( multiplier  );
-          console.log(mesh);
+          // console.log(mesh);
           mesh.castShadow = true;
           mesh.receiveShadow = true;
           scene.add(mesh);
@@ -164,6 +234,15 @@ function Workspace(props) {
       scene.add(light);
       scene.add(light.target);
     }
+    {
+      var axes = new THREE.AxisHelper(50);
+      scene.add(axes);
+    }
+    {
+      var gridXZ = new THREE.GridHelper(100, 100);
+      scene.add(gridXZ);
+    }
+
     
     // resize renderer to screen
     function resizeRendererToDisplaySize(renderer) {
@@ -215,11 +294,17 @@ function Workspace(props) {
         camera.right  =  aspect;
         camera.updateProjectionMatrix();
         cameraHelper.update();
+
   
         // don't draw the camera helper in the original view
         cameraHelper.visible = false;
+        axes.visible = false;
+        gridXZ.visible = false;
+        plane.visible = false;
+        objSphereBound.visible = false;
+        cameraSphereBound.visible = false;
   
-        scene.background.set(0x000000);
+        scene.background.set(0x99adc1);
         renderer.render(scene, camera);
       }
   
@@ -230,11 +315,17 @@ function Workspace(props) {
         // update the camera for this aspect
         camera2.aspect = aspect;
         camera2.updateProjectionMatrix();
-  
+      
+    
         // draw the camera helper in the 2nd view
         cameraHelper.visible = true;
-  
-        scene.background.set(0x000040);
+        axes.visible = true;
+        gridXZ.visible = true;
+        plane.visible = false;
+        objSphereBound.visible = true;
+        cameraSphereBound.visible = true;
+
+        scene.background.set(0x17191e);
         
         renderer.render(scene, camera2);
       }
@@ -246,7 +337,7 @@ function Workspace(props) {
   }
 
   // console.log(camera.position.x);
-  console.log(props.objParams);
+  // console.log(props.objParams);
   const initData = () => {
 
 
