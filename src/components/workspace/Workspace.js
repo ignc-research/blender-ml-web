@@ -36,25 +36,7 @@ function Workspace(props) {
   const far = 50;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-  const xmin = -40;
-  const xmax = 40;
-  const ymin = 10;
-  const ymax = 20;
-  const zmin = 0;
-  const zmax = 100;
-
-  var minSpherical = new Spherical();
-  minSpherical.setFromCartesianCoords(xmin, ymin, zmin);
-  var minRadius = minSpherical.radius;
-  var minPhi = minSpherical.phi;
-  var minTheta = minSpherical.theta;
-
-  var maxSpherical = new Spherical();
-  maxSpherical.setFromCartesianCoords(xmax, ymax, zmax);
-  var maxRadius = maxSpherical.radius;
-  var maxPhi = maxSpherical.phi;
-  var maxTheta = maxSpherical.theta;
-
+  var objRadius = 1;
   const initThree = () => {
 
     // const [btnDisabled, setBtnDisabled] = useState(true)
@@ -68,7 +50,12 @@ function Workspace(props) {
     const renderer = new THREE.WebGLRenderer({canvas});
       
     // camera.zoom = 0.05;
-    camera.position.set(0, 10, 34);
+    
+    camera.up.set(0,0,1);
+    camera.position.set(30, 30, 10);
+    camera.rotation.y = 90 * Math.PI / 180;
+    camera.rotation.z = 90 * Math.PI / 180;
+    camera.lookAt(10,10,10);
     const cameraHelper = new THREE.CameraHelper(camera);
   
     // const gui = new GUI({ autoPlace: false });
@@ -113,7 +100,8 @@ function Workspace(props) {
       0.1, // near
       500, // far
     );
-    camera2.position.set(0, 10, 34);
+    camera2.position.set(30, 30, 10);
+    camera2.up.set(0, 0, 1);
     camera2.lookAt(0, 0, 0);
   
     const controls2 = new OrbitControls(camera2, view2Elem);
@@ -124,7 +112,7 @@ function Workspace(props) {
     scene.background = new THREE.Color('black');
     scene.add(cameraHelper);
     
-    var objRadius = 1;
+  
     const objGeometry = new THREE.SphereGeometry( objRadius, 32, 32 );
     const objMaterial = new THREE.MeshBasicMaterial( { color: 0xffc000, wireframe: true, transparent: true } );
     const objSphereBound = new THREE.Mesh( objGeometry, objMaterial );
@@ -145,6 +133,9 @@ function Workspace(props) {
     const radiusFolder = gui.addFolder('Set Radius');
     radiusFolder.add(objSphereBound.geometry.parameters, 'radius', 0, 30).name('Min Radius').onChange(function () {
       objRadius = objSphereBound.geometry.parameters.radius;
+      console.log(camera.position.x);
+      console.log(camera.position.y);
+      console.log(camera.position.z);
       objSphereBound.scale.x = objRadius;
       objSphereBound.scale.y = objRadius;
       objSphereBound.scale.z = objRadius;
@@ -155,14 +146,15 @@ function Workspace(props) {
       cameraSphereBound.scale.y = cameraRadius;
       cameraSphereBound.scale.z = cameraRadius;
 
-      camera.position.z = cameraRadius;
+      camera.position.x = cameraRadius - 4;
+      camera.position.y = cameraRadius - 4;
     });
     radiusFolder.open();
 
-    const coordinateFolder = gui.addFolder("Coordinates");
-    coordinateFolder.add(camera.position, "x", xmin, xmax, 0.01);
-    coordinateFolder.add(camera.position, "y", ymin, ymax, 0.01);
-    coordinateFolder.add(camera.position, "z", zmin, zmax, 0.01);
+    // const coordinateFolder = gui.addFolder("Coordinates");
+    // coordinateFolder.add(camera.position, "x", xmin, xmax, 0.01).listen();
+    // coordinateFolder.add(camera.position, "y", ymin, ymax, 0.01).listen();
+    // coordinateFolder.add(camera.position, "z", zmin, zmax, 0.01).listen();
 
     const rotationFolder = gui.addFolder("Rotation");
     rotationFolder.add(camera.rotation, "x", -Math.PI * 2, Math.PI * 2, 0.01);
@@ -172,6 +164,10 @@ function Workspace(props) {
     // coordinateFolder.open()
     var guiContainer = document.getElementById('gui-container');
     guiContainer.appendChild(gui.domElement);
+
+
+
+    THREE.Object3D.DefaultUp = new THREE.Vector3(0,0,1);
     
     {
       const planeSize = 100;
@@ -210,7 +206,7 @@ function Workspace(props) {
           mesh.position.x = 0;
           mesh.position.y = 0;
           mesh.position.z = 0;
-          // mesh.rotation.x = - Math.PI / 2;
+          mesh.rotation.x = Math.PI / 2;
 
           var multiplier = 5/mesh.geometry.boundingSphere.radius;
 
@@ -239,8 +235,9 @@ function Workspace(props) {
       scene.add(axes);
     }
     {
-      var gridXZ = new THREE.GridHelper(100, 100);
-      scene.add(gridXZ);
+      var gridXY = new THREE.GridHelper(100, 100);
+      gridXY.rotateX(Math.PI / 2); 
+      scene.add(gridXY);
     }
 
     
@@ -299,7 +296,7 @@ function Workspace(props) {
         // don't draw the camera helper in the original view
         cameraHelper.visible = false;
         axes.visible = false;
-        gridXZ.visible = false;
+        gridXY.visible = false;
         plane.visible = false;
         objSphereBound.visible = false;
         cameraSphereBound.visible = false;
@@ -320,7 +317,7 @@ function Workspace(props) {
         // draw the camera helper in the 2nd view
         cameraHelper.visible = true;
         axes.visible = true;
-        gridXZ.visible = true;
+        gridXY.visible = true;
         plane.visible = false;
         objSphereBound.visible = true;
         cameraSphereBound.visible = true;
@@ -338,18 +335,33 @@ function Workspace(props) {
 
   // console.log(camera.position.x);
   // console.log(props.objParams);
-  const initData = () => {
+  // camera.up.set(0, 0, 1);
+  // var minSpherical = new Spherical();
+  // minSpherical.setFromCartesianCoords(camera.position.x, camera.position.y, objRadius);
+  // var minPhi = minSpherical.phi;
+  // var minTheta = minSpherical.theta;
 
+  // var maxSpherical = new Spherical();
+  // maxSpherical.setFromCartesianCoords(camera.position.x, camera.position.y, camera.position.z);
+  // var maxPhi = maxSpherical.phi;
+  // var maxTheta = maxSpherical.theta;
+
+  const initData = () => {
+    var minSpherical = new Spherical();
+    minSpherical.setFromCartesianCoords(camera.position.x, camera.position.y, objRadius);
+    var maxSpherical = new Spherical();
+    maxSpherical.setFromCartesianCoords(camera.position.x, camera.position.y, camera.position.z);
 
     var data = { 
-        cam_rmin : minRadius,
-        cam_rmax: maxRadius,
-        cam_incmin: minPhi,
-        cam_incmax: maxPhi,
-        cam_azimin: minTheta,
-        cam_azimax: maxTheta,
+        cam_rmin : objRadius,
+        cam_rmax: camera.position.z,
+        cam_incmin: minSpherical.phi,
+        cam_incmax: maxSpherical.phi,
+        cam_azimin: minSpherical.theta,
+        cam_azimax: maxSpherical.theta,
         ...props.objParams
     }
+    console.log(data);
     //Node API test
     axios({
       "method": "POST",
@@ -373,8 +385,9 @@ function Workspace(props) {
   }
 
   const initRenderTrig = () => {
-    initData();
 
+    initData();
+    
     var data = { 
       start : "rendering",
     }
