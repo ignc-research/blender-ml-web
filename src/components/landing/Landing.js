@@ -48,7 +48,7 @@ function Landing(props) {
   }
 
   //input parameters 
-  const [dataFields, setDataFields] = useState({numberOfRenders:0, train_test_split:0});
+  const [dataFields, setDataFields] = useState({numberOfDimensions:2, numberOfRenders:0, train_test_split:0});
   const onChangeFields = (name, e) => {
     setDataFields({...dataFields,[name]:parseFloat(e.target.value)})
   }
@@ -176,8 +176,10 @@ function Landing(props) {
       </video>
       {/*<input type="file" name="file" accept=".ply"onChange={onChangeHandler}/>*/}
 
-      <Button fullWidth variant="outlined" color="secondary" onClick={btnClickedNext}> go to workspace </Button>
-      <Button fullWidth variant="outlined" color="secondary" onClick={btnClickedPrev}> go back to the beginning </Button>
+      <div className="navigation">
+        <Button variant="contained" color="secondary" onClick={btnClickedPrev} >Back</Button>
+        <Button variant="contained" color="default" onClick={btnClickedNext} >go to workspace</Button>
+      </div>
 
       <div id="drop-area">
         <form className="my-form">
@@ -198,7 +200,14 @@ function Landing(props) {
         </div>
       </div>
 
-      {/* TODO: The three parameters should be also send! */}
+      {/* TODO: The parameters should be also send/considered! */}
+      <div className="container">
+        <div className="center set-parameters">
+          Dimensions:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <input value={dataFields.numberOfDimensions} onChange={(e) => onChangeFields("numberOfDimensions", e)} className="form-control" type="number" min="2" max="3"/>&nbsp;
+          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of dimensions. You can choose between 2D and 3D.">Info</span>
+        </div>
+      </div>
       <div className="container">
         <div className="center set-parameters">
           Amount of by blender generated images:&nbsp;
@@ -208,15 +217,15 @@ function Landing(props) {
       </div>
       <div className="container">
         <div className="center set-parameters">
-          Amount of real images:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input className="form-control" type="number" min="0"/>&nbsp;
+          Amount of real images:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <input className="form-control" type="number" defaultValue="0" min="0"/>&nbsp;
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of real images to an integer number bigger or equal to zero.">Info</span>
         </div>
       </div>
       <div className="container">
         <div className="center set-parameters">
-          "Training data / test data" - relation:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input value={dataFields.train_test_split} onChange={(e) => onChangeFields("train_test_split", e)} className="form-control" type="number"/>&nbsp;
+          "Training data / test data" - relation:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <input value={dataFields.train_test_split} onChange={(e) => onChangeFields("train_test_split", e)} className="form-control" type="number" min="0"/>&nbsp;
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="The relation between the training data and the test data is expected. Please write it in the form '<training_data>/<test_data>'. For example '80/20'.">Info</span>
         </div>
       </div>

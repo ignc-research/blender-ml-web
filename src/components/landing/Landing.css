@@ -21,6 +21,22 @@
   margin: 4px 2px;
   cursor: pointer;
 }
+
+.set-parameters input {
+  background-color: white;
+  border: 2px solid #777;
+  border-radius: 4px;
+  color: gray;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  width: 150px;
+}
+
 #drop-area {
   border: 2px dashed #ccc;
   border-radius: 20px;
@@ -81,4 +97,16 @@
 
 #progress-bar {
   display:none;
+}
+
+.navigation {
+  min-height: 30px;
+  padding: 8px 16px;
+  z-index: 100;
+  position: relative;
+  width: 100%;
+}
+
+.navigation button {
+  margin-right: 8px;
 }
