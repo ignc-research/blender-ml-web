@@ -1,7 +1,10 @@
 import './Landing.css';
 import React, { useState } from 'react';
+//import { Dropdown, DropdownButton } from 'react-bootstrap';
 import backgroundVideo from './video.mp4';
 import { Button } from '@material-ui/core';
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
+import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import axios from 'axios';
 
 function Landing(props) {
@@ -12,7 +15,7 @@ function Landing(props) {
   const btnClickedNext = () => {
     // console.log(dataFields);
     if(fileSelected){
-      if(dataFields.numberOfRenders != 0 && dataFields.train_test_split != 0){
+      if(dataFields.numberOfRenders !== 0 && dataFields.train_test_split !== 0){
         setParameters();
         props.stepChanged(1); // Switch to the working space.
       }else{
@@ -172,7 +175,7 @@ function Landing(props) {
   const onChangeHandler = event => {
     sendData(event.target.files[0]);
   }
-
+  
   return (
     <div className="Landing">
       <video autoPlay muted loop id="video">
@@ -181,8 +184,8 @@ function Landing(props) {
       {/*<input type="file" name="file" accept=".ply"onChange={onChangeHandler}/>*/}
 
       <div className="navigation">
-        <Button variant="contained" color="secondary" onClick={btnClickedPrev} >Back</Button>
-        <Button variant="contained" color="default" onClick={btnClickedNext} >go to workspace</Button>
+        <Button variant="contained" color="secondary" onClick={btnClickedPrev} startIcon={<KeyboardBackspaceIcon />}>Back</Button>
+        <Button variant="contained" color="default" onClick={btnClickedNext} endIcon={<DoubleArrowIcon />}>go to workspace</Button>
       </div>
 
       <div id="drop-area">
