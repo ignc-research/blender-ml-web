@@ -12,8 +12,12 @@ function Landing(props) {
   const btnClickedNext = () => {
     // console.log(dataFields);
     if(fileSelected){
-      setParameters();
-      props.stepChanged(1); // Switch to the working space.
+      if(dataFields.numberOfRenders != 0 && dataFields.train_test_split != 0){
+        setParameters();
+        props.stepChanged(1); // Switch to the working space.
+      }else{
+        alert('Please fill out the parameters');
+      }
     }else
       alert('Please select a file');
   }
@@ -48,7 +52,7 @@ function Landing(props) {
   }
 
   //input parameters 
-  const [dataFields, setDataFields] = useState({numberOfDimensions:2, numberOfRenders:0, train_test_split:0});
+  const [dataFields, setDataFields] = useState({numberOfDimensions:2.0, numberOfRenders:0, train_test_split:0});
   const onChangeFields = (name, e) => {
     setDataFields({...dataFields,[name]:parseFloat(e.target.value)})
   }
@@ -204,8 +208,8 @@ function Landing(props) {
       <div className="container">
         <div className="center set-parameters">
           Dimensions:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input value={dataFields.numberOfDimensions} onChange={(e) => onChangeFields("numberOfDimensions", e)} className="form-control" type="number" min="2" max="3"/>&nbsp;
-          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of dimensions. You can choose between 2D and 3D.">Info</span>
+          <input value={dataFields.numberOfDimensions} onChange={(e) => onChangeFields("numberOfDimensions", e)} className="form-control" type="number" min="2.0" max="2.5" step="0.5"/>&nbsp;
+          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of dimensions. You can choose between 2D and 2.5D.">Info</span>
         </div>
       </div>
       <div className="container">
