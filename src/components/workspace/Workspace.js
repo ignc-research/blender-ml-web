@@ -1,5 +1,5 @@
 import './Workspace.css';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as THREE from "three";
 // import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -14,8 +14,14 @@ import Button from '@material-ui/core/Button';
 // import Icon from '@material-ui/core/Icon';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
+
+var hasGui = false;
 function Workspace(props) {
+  var getProgressInterval = null;
+  const [progress, setProgress] = useState(0);
+  const noRenders = parseInt(props.objParams.numberOfRenders);
 
   useEffect(() => {
     initThree();
@@ -38,7 +44,9 @@ function Workspace(props) {
 
   var objRadius = 1;
   const initThree = () => {
-
+    if(hasGui)
+      return;
+    hasGui = true;
     // const [btnDisabled, setBtnDisabled] = useState(true)
     //React.state = {
     //  disabled: true
@@ -173,7 +181,7 @@ function Workspace(props) {
       const planeSize = 100;
   
       const loader = new THREE.TextureLoader();
-      const texture = loader.load('https://threejsfundamentals.org/threejs/resources/images/checker.png');
+      const texture = loader.load('/checker.png');
       texture.wrapS = THREE.RepeatWrapping;
       texture.wrapT = THREE.RepeatWrapping;
       texture.magFilter = THREE.NearestFilter;
@@ -186,12 +194,39 @@ function Workspace(props) {
         side: THREE.DoubleSide,
       });
       var plane = new THREE.Mesh(planeGeo, planeMat);
-      plane.rotation.x = Math.PI * -.5;
-      plane.position.x = 0;
-      plane.position.y = 0;
-      plane.position.z = 0;
+      // plane.rotation.x = Math.PI / 2;
+      plane.rotateZ(Math.PI / 2); 
+      // plane.position.x = 0;
+      // plane.position.y = 0;
+      // plane.position.z = 0;
       scene.add(plane);
     }
+
+    // {
+    //   var texture, loader, material, plane;
+
+    //   loader = new THREE.TextureLoader();
+    //     texture = loader.load( "./checker.png" );
+
+    //     // assuming you want the texture to repeat in both directions:
+    //     texture.wrapS = THREE.RepeatWrapping; 
+    //     texture.wrapT = THREE.RepeatWrapping;
+
+    //     // how many times to repeat in each direction; the default is (1,1),
+    //     //   which is probably why your example wasn't working
+    //     texture.repeat.set( 4, 4 ); 
+
+    //     material = new THREE.MeshLambertMaterial({ map : texture });
+    //     plane = new THREE.Mesh(new THREE.PlaneGeometry(400, 3500), material);
+    //     plane.material.side = THREE.DoubleSide;
+    //     plane.position.x = 100;
+
+    //     // rotation.z is rotation around the z-axis, measured in radians (rather than degrees)
+    //     // Math.PI = 180 degrees, Math.PI / 2 = 90 degrees, etc.
+    //     plane.rotation.z = Math.PI / 2;
+
+    //     scene.add(plane);
+    // }    
 
     // Load 3d object file 
       var file3d = props.obj3d;
@@ -225,7 +260,7 @@ function Workspace(props) {
       const color = 0xFFFFFF;
       const intensity = 1;
       const light = new THREE.DirectionalLight(color, intensity);
-      light.position.set(0, 10, 0);
+      light.position.set(0, 0, 0);
       light.target.position.set(-5, 0, 0);
       scene.add(light);
       scene.add(light.target);
@@ -297,11 +332,11 @@ function Workspace(props) {
         cameraHelper.visible = false;
         axes.visible = false;
         gridXY.visible = false;
-        plane.visible = false;
+        plane.visible = true;
         objSphereBound.visible = false;
         cameraSphereBound.visible = false;
   
-        scene.background.set(0x99adc1);
+        scene.background.set(0x333333);
         renderer.render(scene, camera);
       }
   
@@ -334,7 +369,7 @@ function Workspace(props) {
   }
 
   // console.log(camera.position.x);
-  // console.log(props.objParams);
+  // console.log(props.objParams.numberOfRenders);
   // camera.up.set(0, 0, 1);
   // var minSpherical = new Spherical();
   // minSpherical.setFromCartesianCoords(camera.position.x, camera.position.y, objRadius);
@@ -384,8 +419,9 @@ function Workspace(props) {
     props.stepChanged(0);
   }
 
+  const [disabled, setDisabled] = useState(false);
   const initRenderTrig = () => {
-
+    setDisabled(true);
     initData();
     
     var data = { 
@@ -403,6 +439,34 @@ function Workspace(props) {
     })
     .then((response) => {
       console.log(response)
+      
+
+      getProgressInterval = setInterval(() => {
+        getProgress()
+      }, 2000);
+
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
+  const getProgress = () => {
+    axios({
+      "method": "GET",
+      "url": "http://localhost:3001/progress",
+      "headers": {
+        
+      }
+    })
+    .then((response) => {
+      var value = (parseInt(response.data) - 0) * 100 / (noRenders - 0);
+      setProgress(value);
+      // setProgress(parseInt(response.data))
+
+      if(parseInt(response.data)/noRenders >= 1){
+        clearInterval(getProgressInterval);
+      }
     })
     .catch((error) => {
       console.log(error)
@@ -450,37 +514,55 @@ function Workspace(props) {
           onClick={initRenderTrig} 
           variant="contained"
           color="default"
+          disabled = {disabled}
           // className={classes.button}
           endIcon={<DoubleArrowIcon  />}
         >
         Start Rendering
         </Button>
-        <Button
-          id="train"  
-          onClick={initTrainTrig} 
-          variant="contained"
-          color="default"
-          // disabled={React.state.disabled}
-          // className={classes.button}
-          endIcon={<DoubleArrowIcon  />}
-        >
-        Start Training
-        </Button>
-      
+
+        { progress >= 0.1 &&
+          <div className="progress-bar">
+            <LinearProgress variant="determinate" value={progress} />
+          </div>
+        }
+        { progress >= 0.1 &&
+          <div className="progress-value">
+           {parseFloat(progress).toFixed(1)}%
+          </div>
+        }
+
+        {progress >= 100 &&
+          <Button
+            id="train"  
+            onClick={initTrainTrig} 
+            variant="contained"
+            color="default"
+            // disabled={React.state.disabled}
+            // className={classes.button}
+            endIcon={<DoubleArrowIcon  />}
+          >
+          Start Training
+          </Button>
+        }
       </div>
 
-      <div id="gui-container"></div>
-      {/* <button onClick={zoom} >zoom</button> */}
-      <canvas id="c"></canvas>
-      <div className="split">
-        <div id="view1" tabIndex="1"></div>
-        <div id="view2" tabIndex="2"></div>
-      </div>
-      
-      {/* <div id="threeContainer" />
-      <div id="inset" /> */}
+      {progress < 0.1 &&
+        <div id="gui-container" ></div>
+      }
+      {progress < 0.1 &&
+        <canvas id="c"></canvas>
+      }
+      {progress < 0.1 &&
+        <div className="split">
+          <div id="view1" tabIndex="1"></div>
+          <div id="view2" tabIndex="2"></div>
+        </div>
+      }
+
     </div>
   );
+
 }
 
 export default Workspace;
