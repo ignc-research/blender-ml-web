@@ -521,12 +521,12 @@ function Workspace(props) {
         Start Rendering
         </Button>
 
-        { progress >= 0.1 &&
+        { disabled &&
           <div className="progress-bar">
             <LinearProgress variant="determinate" value={progress} />
           </div>
         }
-        { progress >= 0.1 &&
+        { disabled &&
           <div className="progress-value">
            {parseFloat(progress).toFixed(1)}%
           </div>
@@ -547,13 +547,13 @@ function Workspace(props) {
         }
       </div>
 
-      {progress < 0.1 &&
+      { !disabled &&
         <div id="gui-container" ></div>
       }
-      {progress < 0.1 &&
+      { !disabled &&
         <canvas id="c"></canvas>
       }
-      {progress < 0.1 &&
+      { !disabled &&
         <div className="split">
           <div id="view1" tabIndex="1"></div>
           <div id="view2" tabIndex="2"></div>
