@@ -1,6 +1,5 @@
 import './Landing.css';
 import React, { useState } from 'react';
-//import { Dropdown, DropdownButton } from 'react-bootstrap';
 import backgroundVideo from './video.mp4';
 import { Button } from '@material-ui/core';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
@@ -13,11 +12,15 @@ function Landing(props) {
 
   /* TODO Question: What happens with the data when swtching back from 1 to 0? */
   const btnClickedNext = () => {
-    // console.log(dataFields);
     if(fileSelected){
-      if(dataFields.numberOfRenders !== 0 && dataFields.train_test_split !== 0){
-        setParameters();
-        props.stepChanged(1); // Switch to the working space.
+      if(dataFieldsTemp.numberOfRenders !== 0 && dataFieldsTemp.train_test_split !== ''){
+        convertParameters();
+        if (dataFields.train_test_split === 0.0 || isNaN(dataFields.train_test_split) === true){
+          alert('The "Training data / test data" - relation is not correctly set');
+        }else{
+          setParameters();
+          props.stepChanged(1); // Switch to the working space.
+        }
       }else{
         alert('Please fill out the parameters');
       }
@@ -55,9 +58,28 @@ function Landing(props) {
   }
 
   //input parameters 
+  const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfDimensions:2.0, numberOfRenders:0, train_test_split:''});
   const [dataFields, setDataFields] = useState({numberOfDimensions:2.0, numberOfRenders:0, train_test_split:0});
   const onChangeFields = (name, e) => {
-    setDataFields({...dataFields,[name]:parseFloat(e.target.value)})
+    if (name === "train_test_split"){
+      setDataFieldsTemp({...dataFieldsTemp,[name]:e.target.value})
+    }else{
+      setDataFieldsTemp({...dataFieldsTemp,[name]:parseFloat(e.target.value)})
+    }
+  }
+
+  const convertParameters = () => {
+    setDataFields({...dataFields,numberOfDimensions:dataFieldsTemp.numberOfDimensions})
+    setDataFields({...dataFields,numberOfRenders:dataFieldsTemp.numberOfRenders})
+    let train_test_split_float = 0.0
+    if (dataFieldsTemp.train_test_split.split('/').length === 2) {
+      train_test_split_float = parseFloat(dataFieldsTemp.train_test_split.split('/')[0])/parseFloat(dataFieldsTemp.train_test_split.split('/')[1])
+    }
+    setDataFields({...dataFields,train_test_split:train_test_split_float})
+    
+    dataFields.numberOfDimensions = dataFieldsTemp.numberOfDimensions
+    dataFields.numberOfRenders = dataFieldsTemp.numberOfRenders
+    dataFields.train_test_split = train_test_split_float
   }
 
   const setParameters = () => {
@@ -207,18 +229,18 @@ function Landing(props) {
         </div>
       </div>
 
-      {/* TODO: The parameters should be also send/considered! */}
+      {/* TODO: The parameter 2D/2.5D should be also considered! Make sure that the parameter 'train_test_split' is correctly received by the backend! */}
       <div className="container">
         <div className="center set-parameters">
           Dimensions:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input value={dataFields.numberOfDimensions} onChange={(e) => onChangeFields("numberOfDimensions", e)} className="form-control" type="number" min="2.0" max="2.5" step="0.5"/>&nbsp;
+          <input value={dataFieldsTemp.numberOfDimensions} onChange={(e) => onChangeFields("numberOfDimensions", e)} className="form-control" type="number" min="2.0" max="2.5" step="0.5"/>&nbsp;
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of dimensions. You can choose between 2D and 2.5D.">Info</span>
         </div>
       </div>
       <div className="container">
         <div className="center set-parameters">
           Amount of by blender generated images:&nbsp;
-          <input value={dataFields.numberOfRenders} onChange={(e) => onChangeFields("numberOfRenders", e)} className="form-control" type="number" min="0"/>&nbsp;
+          <input value={dataFieldsTemp.numberOfRenders} onChange={(e) => onChangeFields("numberOfRenders", e)} className="form-control" type="number" min="0"/>&nbsp;
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of by blender generated images to an integer number bigger or equal to zero.">Info</span>
         </div>
       </div>
@@ -229,10 +251,11 @@ function Landing(props) {
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of real images to an integer number bigger or equal to zero.">Info</span>
         </div>
       </div>
+      {/*leave it as a relation and calculate it to a double in the code and send it like this to the backend*/}
       <div className="container">
         <div className="center set-parameters">
           "Training data / test data" - relation:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input value={dataFields.train_test_split} onChange={(e) => onChangeFields("train_test_split", e)} className="form-control" type="number" min="0"/>&nbsp;
+          <input value={dataFieldsTemp.train_test_split} onChange={(e) => onChangeFields("train_test_split", e)} className="form-control" type="text"/>&nbsp;
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="The relation between the training data and the test data is expected. Please write it in the form '<training_data>/<test_data>'. For example '80/20'.">Info</span>
         </div>
       </div>
