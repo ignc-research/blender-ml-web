@@ -59,10 +59,24 @@
   height: 340px;
   overflow: auto;
 }
+#drop-area3 {
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  width: 480px;
+  font-family: sans-serif;
+  color: white;
+  margin: 50px auto;
+  padding: 20px;
+  height: 340px;
+  overflow: auto;
+}
 #drop-area.highlight {
   border-color: red;
 }
 #drop-area2.highlight {
+  border-color: red;
+}
+#drop-area3.highlight {
   border-color: red;
 }
 #gallery {
@@ -93,6 +107,9 @@
   display: none;
 }
 #fileElem2 {
+  display: none;
+}
+#fileElem3 {
   display: none;
 }
 #get-started {
@@ -135,4 +152,15 @@
 
 .navigation button {
   margin-right: 8px;
+}
+
+a:link, a:visited {
+  color: red;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a:link:active, a:visited:active {
+  color: red;
+  cursor: wait;
 }

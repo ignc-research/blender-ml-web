@@ -5,79 +5,20 @@ import { Button } from '@material-ui/core';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import axios from 'axios';
+//import e from 'cors';
 
 function Landing(props) {
   const [fileSelected, setFileSelected] = useState(false);
   const [imagesSelected, setImagesSelected] = useState(false);
+  const [jsonSelected, setJsonSelected] = useState(false);
   const [fileName, setfileName] = useState(''); // for drop area 1
   const [fileCount, setfileCount] = useState(0); // for drop area 2
-
-  const btnClickedNext = () => {
-    if(fileSelected){
-      if(dataFieldsTemp.numberOfRenders !== 0 && dataFieldsTemp.train_test_split !== ''){
-        convertParameters();
-        if (dataFields.train_test_split === 0.0 || isNaN(dataFields.train_test_split) === true){
-          alert('The "Training data / test data" - relation is not correctly set');
-        }else{
-          if(dataFieldsTemp.numberOfRealImages > 0 && !imagesSelected){
-            alert('Please select image files');
-          }else{
-            setParameters();
-            props.stepChanged(1); // Switch to the working space.
-          }
-        }
-      }else{
-        alert('Please fill out the parameters');
-      }
-    }else
-      alert('Please select a ply file');
-  }
-
-  const btnClickedPrev =() => {
-    props.stepChanged(-1); // SWitch back to the initial page.
-  }
-
-  const sendData = data => {
-    setfileName(data.name)
-    props.sendOjb3dToParent(data);
-
-    var bodyFormData = new FormData();
-    bodyFormData.append('name', 'obj');
-    bodyFormData.append('obj3d', data); 
-    axios({
-      "method": "POST",
-      "url": "http://localhost:3001/upload3d",
-      "data": bodyFormData,
-      "headers": {'Content-Type': 'multipart/form-data' }
-    })
-    .then((response) => {
-      console.log(response)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-
-  }
-
-  const sendData2 = (bodyFormDataImages) => { // TODO: test it!
-    axios({
-      "method": "POST",
-      "url": "http://localhost:3001/uploadImg",
-      "data": bodyFormDataImages,
-      "headers": {'Content-Type': 'multipart/form-data' }
-    })
-    .then((response) => {
-      console.log(response)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-
-  }
+  const [fileNameJSON, setfileNameJSON] = useState(''); // for drop area 3
 
   //input parameters 
   const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfDimensions:2.0, numberOfRenders:0, numberOfRealImages:0, train_test_split:''});
   const [dataFields, setDataFields] = useState({numberOfDimensions:2.0, numberOfRenders:0, numberOfRealImages:0, train_test_split:0});
+  
   const onChangeFields = (name, e) => {
     if (name === "train_test_split"){
       setDataFieldsTemp({...dataFieldsTemp,[name]:e.target.value})
@@ -106,16 +47,53 @@ function Landing(props) {
     props.sendParamsToParent(dataFields);
   }
 
-  const dragAndDropArea = event => {
+  const btnClickedNext = () => {
+    if(fileSelected){
+      if(dataFieldsTemp.numberOfRenders !== 0 && dataFieldsTemp.train_test_split !== ''){
+        convertParameters();
+        if (dataFields.train_test_split === 0.0 || isNaN(dataFields.train_test_split) === true){
+          alert('The "Training data / test data" - relation is not correctly set');
+        }else{
+          if(dataFieldsTemp.numberOfRealImages > 0 && !imagesSelected){
+            alert('Please select image files');
+          }else if(dataFieldsTemp.numberOfRealImages > 0 && !jsonSelected){
+            alert('Please select a json file');
+          }else{
+            setParameters();
+            props.stepChanged(1); // Switch to the working space.
+          }
+        }
+      }else{
+        alert('Please fill out the parameters');
+      }
+    }else
+      alert('Please select a ply file');
+  }
 
-    let dropArea = document.getElementById('drop-area')
-    let uploadProgress = [] // track the percentage completion of each request instead of just how many are done
-    let progressBar = document.getElementById('progress-bar')
+  const btnClickedPrev =() => {
+    props.stepChanged(-1); // SWitch back to the initial page.
+  }
+
+  const sendData = (bodyFormData, name) => { // TODO: test it!
+    axios({
+      "method": "POST",
+      "url": "http://localhost:3001/" + name, // upload3d, uploadImg, uploadJson
+      "data": bodyFormData,
+      "headers": {'Content-Type': 'multipart/form-data' }
+    })
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
+  const dragAndDropArea = (event, dropAreaID) => {
+    let dropArea = document.getElementById(dropAreaID)
     
     // Prevent default drag behaviours, otherwise the browser will end up opening the dropped file instead of sending it along to the drop event handler!
-
     ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      let dropArea = document.getElementById('drop-area')
       dropArea.addEventListener(eventName, preventDefaults, false)   
       document.body.addEventListener(eventName, preventDefaults, false)
     })
@@ -126,7 +104,6 @@ function Landing(props) {
     }
     
     // Add an indicator to let the user know that they have indeed dragged the item over the correct area by using CSS to change the color of the border color of the drop area.
-    
     ;['dragenter', 'dragover'].forEach(eventName => {
       dropArea.addEventListener(eventName, highlight, false)
     })
@@ -149,10 +126,114 @@ function Landing(props) {
     function handleDrop(e) {
       let dt = e.dataTransfer
       let files = dt.files
+      handleFiles(files, dropAreaID)
+    }
 
-      handleFiles(files)
+    function handleFiles(files, dropAreaID) {
+      files = [...files]
+      if (dropAreaID === 'drop-area'){
+        let cur_file = files[files.length - 1] // only one file should be uploaded, if multiple, then take the last file
+        if (cur_file.name.split('.ply').length === 2){ // only if the type is ply
+          setFileSelected(true);
+          setfileName(cur_file.name)
+          props.sendOjb3dToParent(cur_file);
+          var bodyFormData = new FormData();
+          bodyFormData.append('name', 'obj');
+          bodyFormData.append('obj3d', cur_file);
+          sendData(bodyFormData, "upload3d");
+        }
+      }
+      if(dropAreaID === 'drop-area2'){
+        var onlyImgFiles = [];
+        for (var i=0; i < files.length; i++){
+          if (files[i].type.split("image").length === 2){ // only if the type is an image
+            onlyImgFiles.push(files[i]);
+          }
+        }
+        var bodyFormDataImages = new FormData();
+        bodyFormDataImages.append('name', 'obj');
+        for (var j=0; j < onlyImgFiles.length; j++){
+          bodyFormDataImages.append(onlyImgFiles[j].name, onlyImgFiles[j]); // 'image' + i.toString()
+        }
+        sendData(bodyFormDataImages, "uploadImg");
+        const galleryNode = document.getElementById("gallery"); // reset the gallery
+        while (galleryNode.firstChild) {
+          galleryNode.removeChild(galleryNode.lastChild);
+        }
+        onlyImgFiles.forEach(previewFile)
+        props.sendImgToParent(onlyImgFiles); // array of image files, not only one
+        setfileCount(onlyImgFiles.length)
+        setImagesSelected(true);
+      }
+      if(dropAreaID === 'drop-area3'){
+        let cur_file = files[files.length - 1] // take the last file
+        if (cur_file.type === "application/json"){ // only if the type is json
+          setfileNameJSON(cur_file.name)
+          props.sendJsonToParent(cur_file);
+          var bodyFormDataJson = new FormData();
+          bodyFormDataJson.append('name', 'obj');
+          bodyFormDataJson.append('json', cur_file);
+          sendData(bodyFormDataJson, "uploadJson")
+          setJsonSelected(true);
+        }
+      }
+    }
+  }
+
+  // Image Preview
+  function previewFile(file) {
+    let reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onloadend = function() {
+      let img = document.createElement('img')
+      img.src = reader.result
+      document.getElementById('gallery').appendChild(img)
+    }
+  }
+
+  const dragAndDropAreaDefault = event => { // TODO: use the progress bar?
+    let dropArea = document.getElementById('drop-area')
+    let uploadProgress = [] // track the percentage completion of each request instead of just how many are done
+    let progressBar = document.getElementById('progress-bar')
+    
+    // Prevent default drag behaviours, otherwise the browser will end up opening the dropped file instead of sending it along to the drop event handler!
+    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      let dropArea = document.getElementById('drop-area')
+      dropArea.addEventListener(eventName, preventDefaults, false)   
+      document.body.addEventListener(eventName, preventDefaults, false)
+    })
+
+    function preventDefaults (e) {
+      e.preventDefault()
+      e.stopPropagation()
     }
     
+    // Add an indicator to let the user know that they have indeed dragged the item over the correct area by using CSS to change the color of the border color of the drop area.
+    ;['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false)
+    })
+
+    ;['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false)
+    })
+
+    function highlight(e) {
+      dropArea.classList.add('highlight')
+    }
+
+    function unhighlight(e) {
+      dropArea.classList.remove('highlight')
+    }
+    
+    // Handle dropped files
+    dropArea.addEventListener('drop', handleDrop, false)
+
+    function handleDrop(e) {
+      let dt = e.dataTransfer
+      let files = dt.files
+      handleFiles(files)
+    }
+
     function handleFiles(files) {
       files = [...files]
       initializeProgress(files.length)
@@ -188,14 +269,16 @@ function Landing(props) {
       formData.append('file', file) // update, if the server needs more information
       xhr.send(formData)
 
-      // Send (NEW)
       setFileSelected(true);
-      sendData(file);
-
+      setfileName(file.name)
+      props.sendOjb3dToParent(file);
+      var bodyFormData = new FormData();
+      bodyFormData.append('name', 'obj');
+      bodyFormData.append('obj3d', file);
+      sendData(bodyFormData, "upload3d");
     }
     
     // Tracking Progress
-    
     function initializeProgress(numFiles) {
       progressBar.value = 0
       uploadProgress = []
@@ -211,93 +294,20 @@ function Landing(props) {
       console.debug('update', fileNumber, percent, total)
       progressBar.value = total
     }
-
-  }
-
-  // TODO: manage better both drop areas
-  // Image Preview
-  function previewFile(file) {
-    let reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onloadend = function() {
-      let img = document.createElement('img')
-      img.src = reader.result
-      document.getElementById('gallery').appendChild(img)
-    }
-  }
-
-  const dragAndDropArea2 = event => {
-
-    let dropArea = document.getElementById('drop-area2')
-    
-    // Prevent default drag behaviours, otherwise the browser will end up opening the dropped file instead of sending it along to the drop event handler!
-    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, preventDefaults, false)   
-      document.body.addEventListener(eventName, preventDefaults, false)
-    })
-    function preventDefaults (e) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-    
-    // Add an indicator to let the user know that they have indeed dragged the item over the correct area by using CSS to change the color of the border color of the drop area.
-    ;['dragenter', 'dragover'].forEach(eventName => {
-      dropArea.addEventListener(eventName, highlight, false)
-    })
-    ;['dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, unhighlight, false)
-    })
-
-    function highlight(e) {
-      dropArea.classList.add('highlight')
-    }
-    function unhighlight(e) {
-      dropArea.classList.remove('highlight')
-    }
-    
-    // Handle dropped files
-    dropArea.addEventListener('drop', handleDrop, false)
-
-    function handleDrop(e) {
-      let dt = e.dataTransfer
-      let files = dt.files
-      handleFiles(files)
-    }
-    
-    function handleFiles(files) {
-      files = [...files]
-      var onlyImgFiles = [];
-      for (var i=0; i < files.length; i++){
-        if (files[i].type.split("image").length === 2){ // only if the type is an image
-          onlyImgFiles.push(files[i]);
-        }
-      }
-      var bodyFormDataImages = new FormData();
-      bodyFormDataImages.append('name', 'obj');
-      for (var j=0; j < onlyImgFiles.length; j++){
-        uploadFile(onlyImgFiles[j], j, bodyFormDataImages)
-      }
-      sendData2(bodyFormDataImages);
-      const galleryNode = document.getElementById("gallery"); // reset the gallery
-      while (galleryNode.firstChild) {
-        galleryNode.removeChild(galleryNode.lastChild);
-      }
-      onlyImgFiles.forEach(previewFile)
-      props.sendImgToParent(onlyImgFiles); // array of image files, not only one
-      setfileCount(onlyImgFiles.length)
-      setImagesSelected(true);
-    }
-
-    function uploadFile(file, i, bodyFormDataImages) {
-      bodyFormDataImages.append(file.name, file); // 'image' + i.toString()
-    }
   }
 
   //When file selected, post it to server
   const onChangeHandler = event => {
+    let file = event.target.files[0]
     setFileSelected(true);
-    sendData(event.target.files[0]);
+    setfileName(file.name)
+    props.sendOjb3dToParent(file);
+    var bodyFormData = new FormData();
+    bodyFormData.append('name', 'obj');
+    bodyFormData.append('obj3d', file);
+    sendData(bodyFormData, "upload3d");
   }
+
   const onChangeHandler2 = event => {
     setImagesSelected(true);
     var bodyFormDataImages = new FormData();
@@ -310,9 +320,20 @@ function Landing(props) {
       bodyFormDataImages.append(event.target.files[i].name, event.target.files[i]); // 'image' + i.toString()
       previewFile(event.target.files[i])
     }
-    sendData2(bodyFormDataImages);
+    sendData(bodyFormDataImages, "uploadImg");
     props.sendImgToParent(event.target.files); // array of files, not only one
     setfileCount(event.target.files.length)
+  }
+
+  const onChangeHandler3 = event => {
+    let file = event.target.files[0]
+    setJsonSelected(true);
+    setfileNameJSON(file.name)
+    props.sendJsonToParent(file);
+    var bodyFormData = new FormData();
+    bodyFormData.append('name', 'obj');
+    bodyFormData.append('json', file);
+    sendData(bodyFormData, "uploadJson");
   }
   
   return (
@@ -320,7 +341,6 @@ function Landing(props) {
       <video autoPlay muted loop id="video">
           <source src={backgroundVideo} type="video/mp4" />
       </video>
-      {/*<input type="file" name="file" accept=".ply"onChange={onChangeHandler}/>*/}
 
       <div className="navigation">
         <Button id="nav-back" variant="contained" color="secondary" onClick={btnClickedPrev} startIcon={<KeyboardBackspaceIcon />}>Back</Button>
@@ -330,13 +350,11 @@ function Landing(props) {
       <div id="drop-area">
         <form className="my-form">
           <br /><br /><p>Upload a 3D object ( one ply file )<br /><br />with the file dialog or<br />
-          <Button color="secondary" onClick={dragAndDropArea}> activate </Button><br />
+          <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area')} > activate </Button><br />
           the drag and drop behavior for the dashed region</p>
           <br /><input type="file" name="file" id="fileElem" accept=".ply" onChange={onChangeHandler}/>
           <label className="button" htmlFor="fileElem">Select a file</label>
           &nbsp;{fileName}
-          <br /><br /><progress id="progress-bar" max="100" value="0"></progress>
-          {/* TODO: A progress bar with our service! For now it is hided. The progress bar should be also working with the file dialog. */}
         </form>
       </div>
 
@@ -379,17 +397,32 @@ function Landing(props) {
       </div>
 
       {dataFieldsTemp.numberOfRealImages > 0 && 
-        <div id="drop-area2">
-          <form className="my-form">
-            <br /><br /><p>Upload one or multiple image file/s<br /><br />with the file dialog or<br />
-            {/* Important: if clicked again or drag&dropped again, the images will be reseted! That is why it is not a problem anymore that the same image could be uploaded (once per button click and once per drag&drop) */}
-            <Button color="secondary" onClick={dragAndDropArea2}> activate </Button><br />
-            the drag and drop behavior for the dashed region</p>
-            <br /><input type="file" name="file" id="fileElem2" multiple accept="image/*" onChange={onChangeHandler2}/>
-            <label className="button" htmlFor="fileElem2">Select some files</label>
-            &nbsp;{fileCount}&nbsp;file/s uploaded
-            <div id="gallery"></div>
-          </form>
+        <div>
+          <div id="drop-area2">
+            <form className="my-form">
+              {/* Important: if clicked again or drag&dropped again, the images will be reseted! That is why it is not a problem anymore that the same image could be uploaded (once per button click and once per drag&drop) */}
+              <br /><br /><p>Upload one or multiple image file/s<br /><br />with the file dialog or<br />
+              <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area2')}> activate </Button><br />
+              the drag and drop behavior for the dashed region</p>
+              <br /><input type="file" name="file" id="fileElem2" multiple accept="image/*" onChange={onChangeHandler2}/>
+              <label className="button" htmlFor="fileElem2">Select some files</label>
+              &nbsp;{fileCount}&nbsp;file/s uploaded
+              <br /><br /><progress id="progress-bar" max="100" value="0"></progress>
+              {/* TODO: A progress bar with our service! For now it is hided. The progress bar should be also working with the file dialog. See dragAndDropAreaDefault(). */}
+              <div id="gallery"></div>
+            </form>
+          </div>
+          <div id="drop-area3">
+            <form className="my-form">
+              {/* TODO: change the hyperlink to the website to 2D or 2.5D according to the user text input!? (http://2d-on-2d.annotate.photo/ vs. http://3d-on-2d.annotate.photo/) */}
+              <br /><br /><p>Visit <a href="http://annotate.photo/" target="_blank" rel="noreferrer">annotate.photo</a> and after the manual image labeling<br /><br />upload the resulting json file<br /><br />with the file dialog or<br />
+              <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area3')}> activate </Button><br />
+              the drag and drop behavior for the dashed region</p>
+              <br /><input type="file" name="file" id="fileElem3" accept="application/json" onChange={onChangeHandler3}/>
+              <label className="button" htmlFor="fileElem3">Select file</label>
+              &nbsp;{fileNameJSON}
+            </form>
+          </div>
         </div>
       }<br />
 

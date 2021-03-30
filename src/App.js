@@ -19,6 +19,10 @@ function App() {
   const setTheImgForWorkspace = (imgFromLanding) => {
     setImg(imgFromLanding);
   }
+  const [json, setJson] = useState(null);
+  const setTheJsonForWorkspace = (jsonFromLanding) => {
+    setJson(jsonFromLanding);
+  }
   const [objParams, setObjParams] = useState(null);
   const setPramsForWorkspace = (objParamsFromLanding) => {
     setObjParams(objParamsFromLanding);
@@ -30,10 +34,10 @@ function App() {
         <Start stepChanged={stepChanged}/>
       }
       {step === 0 &&
-        <Landing stepChanged={stepChanged} sendOjb3dToParent={setTheObj3dForWorkspace} sendImgToParent={setTheImgForWorkspace} sendParamsToParent={setPramsForWorkspace}/>
+        <Landing stepChanged={stepChanged} sendOjb3dToParent={setTheObj3dForWorkspace} sendImgToParent={setTheImgForWorkspace} sendJsonToParent={setTheJsonForWorkspace} sendParamsToParent={setPramsForWorkspace}/>
       }
       {step === 1 &&
-        <Workspace stepChanged={stepChanged} obj3d={obj3d} img={img} objParams={objParams}/>
+        <Workspace stepChanged={stepChanged} obj3d={obj3d} img={img} json={json} objParams={objParams}/>
       }
       
     </div>
