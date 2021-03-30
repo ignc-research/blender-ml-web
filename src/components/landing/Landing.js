@@ -323,7 +323,8 @@ function Landing(props) {
       galleryNode.removeChild(galleryNode.lastChild);
     }
     for (var i=0; i < event.target.files.length; i++){
-      bodyFormDataImages.append(event.target.files[i].name, event.target.files[i]); // 'image' + i.toString()
+      // bodyFormDataImages.append(event.target.files[i].name, event.target.files[i]); // 'image' + i.toString()
+      bodyFormDataImages.append("photos", event.target.files[i]); // 'image' + i.toString()
       previewFile(event.target.files[i])
     }
     sendData(bodyFormDataImages, "uploadImg");
