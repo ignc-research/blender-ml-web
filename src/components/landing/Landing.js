@@ -14,6 +14,7 @@ function Landing(props) {
   const [fileName, setfileName] = useState(''); // for drop area 1
   const [fileCount, setfileCount] = useState(0); // for drop area 2
   const [fileNameJSON, setfileNameJSON] = useState(''); // for drop area 3
+  const [websiteLink, setWebsiteLink] = useState("http://2d-on-2d.annotate.photo/"); // 2D is the default // "http://annotate.photo/"
 
   //input parameters 
   const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfDimensions:2.0, numberOfRenders:0, numberOfRealImages:0, train_test_split:''});
@@ -24,6 +25,11 @@ function Landing(props) {
       setDataFieldsTemp({...dataFieldsTemp,[name]:e.target.value})
     }else{
       setDataFieldsTemp({...dataFieldsTemp,[name]:parseFloat(e.target.value)})
+      if(name === "numberOfDimensions"){
+        // change the hyperlink to the website to 2D or 2.5D according to the user text input
+        if(parseFloat(e.target.value) === 2.0) setWebsiteLink("http://2d-on-2d.annotate.photo/")
+        if(parseFloat(e.target.value) === 2.5) setWebsiteLink("http://3d-on-2d.annotate.photo/")
+      }
     }
   }
 
@@ -414,8 +420,7 @@ function Landing(props) {
           </div>
           <div id="drop-area3">
             <form className="my-form">
-              {/* TODO: change the hyperlink to the website to 2D or 2.5D according to the user text input!? (http://2d-on-2d.annotate.photo/ vs. http://3d-on-2d.annotate.photo/) */}
-              <br /><br /><p>Visit <a href="http://annotate.photo/" target="_blank" rel="noreferrer">annotate.photo</a> and after the manual image labeling<br /><br />upload the resulting json file<br /><br />with the file dialog or<br />
+              <br /><br /><p>Visit <a href={websiteLink} target="_blank" rel="noreferrer">annotate.photo</a> and after the manual image labeling<br /><br />upload the resulting json file<br /><br />with the file dialog or<br />
               <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area3')}> activate </Button><br />
               the drag and drop behavior for the dashed region</p>
               <br /><input type="file" name="file" id="fileElem3" accept="application/json" onChange={onChangeHandler3}/>
