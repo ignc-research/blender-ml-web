@@ -1,10 +1,11 @@
 import './Landing.css';
 import React, { useState } from 'react';
+import backgroundVideo from './video.mp4';
 import { Button } from '@material-ui/core';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
-import axios from 'axios';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import axios from 'axios';
 //import e from 'cors';
 
 function Landing(props) {
@@ -14,12 +15,16 @@ function Landing(props) {
   const [fileName, setfileName] = useState(''); // for drop area 1
   const [fileCount, setfileCount] = useState(0); // for drop area 2
   const [fileNameJSON, setfileNameJSON] = useState(''); // for drop area 3
-  const [websiteLink, setWebsiteLink] = useState("http://2d-on-2d.annotate.photo/"); // 2D is the default // "http://annotate.photo/"
   const [jsonUploadNeeded, setJsonUploadNeeded] = useState(false); // TODO: receive this state from workspace for example !?
 
+  //change the hyperlink to the website to 2D or 2.5D according to the user choice
+  var website = "http://annotate.photo/"
+  if(props.dimension === 2) website = "http://2d-on-2d.annotate.photo/"
+  if(props.dimension === 2.5) website = "http://3d-on-2d.annotate.photo/"
+
   //input parameters 
-  const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfDimensions:2.0, numberOfRenders:10, numberOfRealImages:0, train_test_split:'5/5'});
-  const [dataFields, setDataFields] = useState({numberOfDimensions:2.0, numberOfRenders:0, numberOfRealImages:0, train_test_split:0});
+  const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfRenders:10, numberOfRealImages:0, train_test_split:'5/5'});
+  const [dataFields, setDataFields] = useState({numberOfRenders:0, numberOfRealImages:0, train_test_split:0});
   
   var getProgressInterval = null;
   const [progress, setProgress] = useState(0);
@@ -52,15 +57,11 @@ function Landing(props) {
     })
   }
 
-  console.log("props.noRenders");
-  console.log(props.noRenders);
-
-  if(props.noRenders != -1) {
+  if(props.noRenders !== -1) {
     renderingStarted();
   }
 
   const initTrainTrig = () => {
-    
     var data = { 
       start : "training",
     }
@@ -87,16 +88,10 @@ function Landing(props) {
       setDataFieldsTemp({...dataFieldsTemp,[name]:e.target.value})
     }else{
       setDataFieldsTemp({...dataFieldsTemp,[name]:parseFloat(e.target.value)})
-      if(name === "numberOfDimensions"){
-        // change the hyperlink to the website to 2D or 2.5D according to the user text input
-        if(parseFloat(e.target.value) === 2.0) setWebsiteLink("http://2d-on-2d.annotate.photo/")
-        if(parseFloat(e.target.value) === 2.5) setWebsiteLink("http://3d-on-2d.annotate.photo/")
-      }
     }
   }
 
   const convertParameters = () => {
-    setDataFields({...dataFields,numberOfDimensions:dataFieldsTemp.numberOfDimensions})
     setDataFields({...dataFields,numberOfRenders:dataFieldsTemp.numberOfRenders})
     setDataFields({...dataFields,numberOfRealImages:dataFieldsTemp.numberOfRealImages})
     let train_test_split_float = 0.0
@@ -105,7 +100,6 @@ function Landing(props) {
     }
     setDataFields({...dataFields,train_test_split:train_test_split_float})
     
-    dataFields.numberOfDimensions = dataFieldsTemp.numberOfDimensions
     dataFields.numberOfRenders = dataFieldsTemp.numberOfRenders
     dataFields.numberOfRealImages = dataFieldsTemp.numberOfRealImages
     dataFields.train_test_split = train_test_split_float
@@ -406,26 +400,28 @@ function Landing(props) {
   
   return (
     <div className="Landing">
+      <video autoPlay muted loop id="video">
+          <source src={backgroundVideo} type="video/mp4" />
+      </video>
 
       <div className="navigation">
         <Button id="nav-back" variant="contained" color="secondary" onClick={btnClickedPrev} startIcon={<KeyboardBackspaceIcon />}>Back</Button>
       </div>
 
-      {/* Progress bar */}
-
-      { props.noRenders != -1 &&
-      <div className="progress-section">
+      {/* Start of progress bar */}
+      { props.noRenders !== -1 &&
+        <div className="progress-section">
           <div className="progress-bar">
             <LinearProgress variant="determinate" value={progress} />
           </div>
           <div className="progress-value">
-          {parseFloat(progress).toFixed(1)}%
+            {parseFloat(progress).toFixed(1)}%
           </div>
-      </div>
+        </div>
       }
 
       {progress >= 100 &&
-      <h1>
+        <h1>
           <Button
             id="train"  
             onClick={initTrainTrig} 
@@ -435,101 +431,92 @@ function Landing(props) {
             // className={classes.button}
             endIcon={<DoubleArrowIcon  />}
           >
-          Start Training
+            Start Training
           </Button>
-      </h1>
+        </h1>
       }
- 
-      {/* Progress bar */}
-{ props.noRenders == -1 &&
-<div>
-<div id="drop-area">
-        <form className="my-form">
-          <br /><br /><p>Upload a 3D object ( one ply file )<br /><br />with the file dialog or<br />
-          <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area')} > activate </Button><br />
-          the drag and drop behavior for the dashed region</p>
-          <br /><input type="file" name="file" id="fileElem" accept=".ply" onChange={onChangeHandler}/>
-          <label className="button" htmlFor="fileElem">Select a file</label>
-          &nbsp;{fileName}
-        </form>
-      </div>
+      {/* End of progress bar */}
 
-      <div className="container">
-        <div className="center">
-          <h3 className="set-parameters">Parameters</h3>
-        </div>
-      </div>
-
-      {/* TODO: The parameter 2D/2.5D should be also considered! Make sure that the parameter 'train_test_split' is correctly received by the backend! */}
-      <div className="container">
-        <div className="center set-parameters">
-          Dimensions:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input value={dataFieldsTemp.numberOfDimensions} onChange={(e) => onChangeFields("numberOfDimensions", e)} className="form-control" type="number" min="2.0" max="2.5" step="0.5"/>&nbsp;
-          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of dimensions. You can choose between 2D and 2.5D.">Info</span>
-        </div>
-      </div>
-      <div className="container">
-        <div className="center set-parameters">
-          Amount of by blender generated images:&nbsp;
-          <input value={dataFieldsTemp.numberOfRenders} onChange={(e) => onChangeFields("numberOfRenders", e)} className="form-control" type="number" min="0"/>&nbsp;
-          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of by blender generated images to an integer number bigger or equal to zero.">Info</span>
-        </div>
-      </div>
-      {/*TODO: better ask: real images yes or no and calculate here the uploaded images and send this number to backend if necessary OR give at least an error if the number of images given and uploaded do not match*/}
-      <div className="container">
-        <div className="center set-parameters">
-          Amount of real images:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input value={dataFieldsTemp.numberOfRealImages} onChange={(e) => onChangeFields("numberOfRealImages", e)} className="form-control" type="number" min="0"/>&nbsp;
-          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of real images to an integer number bigger or equal to zero. If a number bigger then zero is chosen, a second drag and drop area will be shown on the bottom of the page for uploading the images.">Info</span>
-        </div>
-      </div>
-      {/*leave it as a relation and calculate it to a double in the code and send it like this to the backend*/}
-      <div className="container">
-        <div className="center set-parameters">
-          "Training data / test data" - relation:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input value={dataFieldsTemp.train_test_split} onChange={(e) => onChangeFields("train_test_split", e)} className="form-control" type="text"/>&nbsp;
-          <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="The relation between the training data and the test data is expected. Please write it in the form '<training_data>/<test_data>'. For example '80/20'.">Info</span>
-        </div>
-      </div>
-      
-
-      {dataFieldsTemp.numberOfRealImages > 0 && 
-          <div id="drop-area2">
+      { props.noRenders === -1 &&
+        <div>
+          <div id="drop-area">
             <form className="my-form">
-              {/* Important: if clicked again or drag&dropped again, the images will be reseted! That is why it is not a problem anymore that the same image could be uploaded (once per button click and once per drag&drop) */}
-              <br /><br /><p>Upload one or multiple image file/s<br /><br />with the file dialog or<br />
-              <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area2')}> activate </Button><br />
+              <br /><br /><p>Upload a 3D object ( one ply file )<br /><br />with the file dialog or<br />
+              <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area')} > activate </Button><br />
               the drag and drop behavior for the dashed region</p>
-              <br /><input type="file" name="file" id="fileElem2" multiple accept="image/*" onChange={onChangeHandler2}/>
-              <label className="button" htmlFor="fileElem2">Select some files</label>
-              &nbsp;{fileCount}&nbsp;file/s uploaded
-              <br /><br /><progress id="progress-bar" max="100" value="0"></progress>
-              {/* TODO: A progress bar with our service! For now it is hided. The progress bar should be also working with the file dialog. See dragAndDropAreaDefault(). */}
-              <div id="gallery"></div>
+              <br /><input type="file" name="file" id="fileElem" accept=".ply" onChange={onChangeHandler}/>
+              <label className="button" htmlFor="fileElem">Select a file</label>
+              &nbsp;{fileName}
             </form>
           </div>
+
+          <div className="container">
+            <div className="center">
+              <h3 className="set-parameters">Parameters</h3>
+            </div>
+          </div>
+
+          {/* TODO: Make sure that the parameter 'train_test_split' is correctly received by the backend! */}
+          <div className="container">
+            <div className="center set-parameters">
+              Amount of by blender generated images:&nbsp;
+              <input value={dataFieldsTemp.numberOfRenders} onChange={(e) => onChangeFields("numberOfRenders", e)} className="form-control" type="number" min="0"/>&nbsp;
+              <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of by blender generated images to an integer number bigger or equal to zero.">Info</span>
+            </div>
+          </div>
+          {/*TODO: better ask: real images yes or no and calculate here the uploaded images and send this number to backend if necessary OR give at least an error if the number of images given and uploaded do not match*/}
+          <div className="container">
+            <div className="center set-parameters">
+              Amount of real images:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <input value={dataFieldsTemp.numberOfRealImages} onChange={(e) => onChangeFields("numberOfRealImages", e)} className="form-control" type="number" min="0"/>&nbsp;
+              <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of real images to an integer number bigger or equal to zero. If a number bigger then zero is chosen, a second drag and drop area will be shown on the bottom of the page for uploading the images.">Info</span>
+            </div>
+          </div>
+          {/*leave it as a relation and calculate it to a double in the code and send it like this to the backend*/}
+          <div className="container">
+            <div className="center set-parameters">
+              "Training data / test data" - relation:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <input value={dataFieldsTemp.train_test_split} onChange={(e) => onChangeFields("train_test_split", e)} className="form-control" type="text"/>&nbsp;
+              <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="The relation between the training data and the test data is expected. Please write it in the form '<training_data>/<test_data>'. For example '80/20'.">Info</span>
+            </div>
+          </div>
+        
+          {dataFieldsTemp.numberOfRealImages > 0 && 
+            <div id="drop-area2">
+              <form className="my-form">
+                {/* Important: if clicked again or drag&dropped again, the images will be reseted! That is why it is not a problem anymore that the same image could be uploaded (once per button click and once per drag&drop) */}
+                <br /><br /><p>Upload one or multiple image file/s<br /><br />with the file dialog or<br />
+                <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area2')}> activate </Button><br />
+                the drag and drop behavior for the dashed region</p>
+                <br /><input type="file" name="file" id="fileElem2" multiple accept="image/*" onChange={onChangeHandler2}/>
+                <label className="button" htmlFor="fileElem2">Select some files</label>
+                &nbsp;{fileCount}&nbsp;file/s uploaded
+                <br /><br /><progress id="progress-bar" max="100" value="0"></progress>
+                {/* TODO: A progress bar with our service! For now it is hided. The progress bar should be also working with the file dialog. See dragAndDropAreaDefault(). */}
+                <div id="gallery"></div>
+              </form>
+            </div>
+          }
+
+          <div className="container">
+            <div className="center">
+              <Button id="nav-go" variant="contained" color="default" onClick={btnClickedNext} endIcon={<DoubleArrowIcon />}>go to workspace</Button>
+            </div>
+          </div>
+        </div>
       }
 
-      <div className="container">
-        <div className="center">
-          <Button id="nav-go" variant="contained" color="default" onClick={btnClickedNext} endIcon={<DoubleArrowIcon />}>go to workspace</Button>
+      { props.noRenders !== -1 &&
+        <div id="drop-area3">
+          <form className="my-form">
+            <br /><br /><p>Visit <a href={website} target="_blank" rel="noreferrer">annotate.photo</a> and after the manual image labeling<br /><br />upload the resulting json file<br /><br />with the file dialog or<br />
+            <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area3')}> activate </Button><br />
+            the drag and drop behavior for the dashed region</p>
+            <br /><input type="file" name="file" id="fileElem3" accept="application/json" onChange={onChangeHandler3}/>
+            <label className="button" htmlFor="fileElem3">Select file</label>
+            &nbsp;{fileNameJSON}
+          </form>
         </div>
-      </div>
-</div>
-}
-     
-
-      { props.noRenders != -1 &&
-          <div id="drop-area3">
-            <form className="my-form">
-              <br /><br /><p>Visit <a href={websiteLink} target="_blank" rel="noreferrer">annotate.photo</a> and after the manual image labeling<br /><br />upload the resulting json file<br /><br />with the file dialog or<br />
-              <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area3')}> activate </Button><br />
-              the drag and drop behavior for the dashed region</p>
-              <br /><input type="file" name="file" id="fileElem3" accept="application/json" onChange={onChangeHandler3}/>
-              <label className="button" htmlFor="fileElem3">Select file</label>
-              &nbsp;{fileNameJSON}
-            </form>
-          </div>
       }
     </div>
   );

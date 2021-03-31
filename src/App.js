@@ -9,7 +9,11 @@ function App() {
   const [noRenders, setNoRenders] = useState(-1);
   const stepChanged = (step) => {
     setStep(step);
-  } 
+  }
+  const [dimension, setDimension] = useState(2);
+  const dimensionChanged = (dimension) => {
+    setDimension(dimension);
+  }
 
   // variable for 3d object and its function to set
   const [obj3d, setObj3d] = useState(null);
@@ -34,19 +38,17 @@ function App() {
     setStep(0);
   }
 
-
   return (
     <div className="App">
       {step === -1 &&
-        <Start stepChanged={stepChanged}/>
+        <Start stepChanged={stepChanged} dimensionChanged={dimensionChanged}/>
       }
       {step === 0 &&
-        <Landing noRenders={noRenders} stepChanged={stepChanged} sendOjb3dToParent={setTheObj3dForWorkspace} sendImgToParent={setTheImgForWorkspace} sendJsonToParent={setTheJsonForWorkspace} sendParamsToParent={setPramsForWorkspace}/>
+        <Landing noRenders={noRenders} stepChanged={stepChanged} dimension={dimension} sendOjb3dToParent={setTheObj3dForWorkspace} sendImgToParent={setTheImgForWorkspace} sendJsonToParent={setTheJsonForWorkspace} sendParamsToParent={setPramsForWorkspace}/>
       }
       {step === 1 &&
         <Workspace stepChanged={stepChanged} obj3d={obj3d} img={img} json={json} objParams={objParams} renderingStarted={renderingStarted}/>
       }
-      
     </div>
   );
 }
