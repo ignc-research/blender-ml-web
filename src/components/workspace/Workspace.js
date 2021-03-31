@@ -44,9 +44,9 @@ function Workspace(props) {
 
   var objRadius = 1;
   const initThree = () => {
-    if(hasGui)
-      return;
-    hasGui = true;
+    // if(hasGui)
+    //   return;
+    // hasGui = true;
     // const [btnDisabled, setBtnDisabled] = useState(true)
     //React.state = {
     //  disabled: true
@@ -421,7 +421,7 @@ function Workspace(props) {
 
   const [disabled, setDisabled] = useState(false);
   const initRenderTrig = () => {
-    setDisabled(true);
+    // setDisabled(true);
     initData();
     
     var data = { 
@@ -440,10 +440,11 @@ function Workspace(props) {
     .then((response) => {
       console.log(response)
       
+      props.renderingStarted(noRenders);
 
-      getProgressInterval = setInterval(() => {
-        getProgress()
-      }, 2000);
+      // getProgressInterval = setInterval(() => {
+      //   getProgress()
+      // }, 2000);
 
     })
     .catch((error) => {

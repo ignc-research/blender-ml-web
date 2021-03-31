@@ -1,10 +1,10 @@
 import './Landing.css';
 import React, { useState } from 'react';
-import backgroundVideo from './video.mp4';
 import { Button } from '@material-ui/core';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import axios from 'axios';
+import LinearProgress from '@material-ui/core/LinearProgress';
 //import e from 'cors';
 
 function Landing(props) {
@@ -18,9 +18,70 @@ function Landing(props) {
   const [jsonUploadNeeded, setJsonUploadNeeded] = useState(false); // TODO: receive this state from workspace for example !?
 
   //input parameters 
-  const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfDimensions:2.0, numberOfRenders:0, numberOfRealImages:0, train_test_split:''});
+  const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfDimensions:2.0, numberOfRenders:10, numberOfRealImages:0, train_test_split:'5/5'});
   const [dataFields, setDataFields] = useState({numberOfDimensions:2.0, numberOfRenders:0, numberOfRealImages:0, train_test_split:0});
   
+  var getProgressInterval = null;
+  const [progress, setProgress] = useState(0);
+  // For progress bar, when "Rendering" started 
+  const renderingStarted = () => {
+      getProgressInterval = setInterval(() => {
+        getProgress()
+      }, 2000);
+  }
+
+  const getProgress = () => {
+    axios({
+      "method": "GET",
+      "url": "http://localhost:3001/progress",
+      "headers": {
+        
+      }
+    })
+    .then((response) => {
+      var value = (parseInt(response.data) - 0) * 100 / (props.noRenders - 0);
+      setProgress(value);
+      // setProgress(parseInt(response.data))
+
+      if(parseInt(response.data)/props.noRenders >= 1){
+        clearInterval(getProgressInterval);
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
+  console.log("props.noRenders");
+  console.log(props.noRenders);
+
+  if(props.noRenders != -1) {
+    renderingStarted();
+  }
+
+  const initTrainTrig = () => {
+    
+    var data = { 
+      start : "training",
+    }
+    //Node API test
+    axios({
+      "method": "POST",
+      "url": "http://localhost:3001/receivetraintrigger",
+      "headers": {
+        
+      }, "params": {
+        "myData": data
+      }
+    })
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
   const onChangeFields = (name, e) => {
     if (name === "train_test_split"){
       setDataFieldsTemp({...dataFieldsTemp,[name]:e.target.value})
@@ -345,16 +406,44 @@ function Landing(props) {
   
   return (
     <div className="Landing">
-      <video autoPlay muted loop id="video">
-          <source src={backgroundVideo} type="video/mp4" />
-      </video>
 
       <div className="navigation">
         <Button id="nav-back" variant="contained" color="secondary" onClick={btnClickedPrev} startIcon={<KeyboardBackspaceIcon />}>Back</Button>
-        <Button id="nav-go" variant="contained" color="default" onClick={btnClickedNext} endIcon={<DoubleArrowIcon />}>go to workspace</Button>
       </div>
 
-      <div id="drop-area">
+      {/* Progress bar */}
+
+      { props.noRenders != -1 &&
+      <div className="progress-section">
+          <div className="progress-bar">
+            <LinearProgress variant="determinate" value={progress} />
+          </div>
+          <div className="progress-value">
+          {parseFloat(progress).toFixed(1)}%
+          </div>
+      </div>
+      }
+
+      {progress >= 100 &&
+      <h1>
+          <Button
+            id="train"  
+            onClick={initTrainTrig} 
+            variant="contained"
+            color="default"
+            // disabled={React.state.disabled}
+            // className={classes.button}
+            endIcon={<DoubleArrowIcon  />}
+          >
+          Start Training
+          </Button>
+      </h1>
+      }
+ 
+      {/* Progress bar */}
+{ props.noRenders == -1 &&
+<div>
+<div id="drop-area">
         <form className="my-form">
           <br /><br /><p>Upload a 3D object ( one ply file )<br /><br />with the file dialog or<br />
           <Button color="secondary" onClick={(e) => dragAndDropArea(e, 'drop-area')} > activate </Button><br />
@@ -402,9 +491,9 @@ function Landing(props) {
           <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="The relation between the training data and the test data is expected. Please write it in the form '<training_data>/<test_data>'. For example '80/20'.">Info</span>
         </div>
       </div>
+      
 
       {dataFieldsTemp.numberOfRealImages > 0 && 
-        <div>
           <div id="drop-area2">
             <form className="my-form">
               {/* Important: if clicked again or drag&dropped again, the images will be reseted! That is why it is not a problem anymore that the same image could be uploaded (once per button click and once per drag&drop) */}
@@ -419,6 +508,18 @@ function Landing(props) {
               <div id="gallery"></div>
             </form>
           </div>
+      }
+
+      <div className="container">
+        <div className="center">
+          <Button id="nav-go" variant="contained" color="default" onClick={btnClickedNext} endIcon={<DoubleArrowIcon />}>go to workspace</Button>
+        </div>
+      </div>
+</div>
+}
+     
+
+      { props.noRenders != -1 &&
           <div id="drop-area3">
             <form className="my-form">
               <br /><br /><p>Visit <a href={websiteLink} target="_blank" rel="noreferrer">annotate.photo</a> and after the manual image labeling<br /><br />upload the resulting json file<br /><br />with the file dialog or<br />
@@ -429,9 +530,7 @@ function Landing(props) {
               &nbsp;{fileNameJSON}
             </form>
           </div>
-        </div>
-      }<br />
-
+      }
     </div>
   );
 }
