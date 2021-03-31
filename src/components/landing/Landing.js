@@ -15,6 +15,7 @@ function Landing(props) {
   const [fileCount, setfileCount] = useState(0); // for drop area 2
   const [fileNameJSON, setfileNameJSON] = useState(''); // for drop area 3
   const [websiteLink, setWebsiteLink] = useState("http://2d-on-2d.annotate.photo/"); // 2D is the default // "http://annotate.photo/"
+  const [jsonUploadNeeded, setJsonUploadNeeded] = useState(false); // TODO: receive this state from workspace for example !?
 
   //input parameters 
   const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfDimensions:2.0, numberOfRenders:0, numberOfRealImages:0, train_test_split:''});
@@ -62,7 +63,7 @@ function Landing(props) {
         }else{
           if(dataFieldsTemp.numberOfRealImages > 0 && !imagesSelected){
             alert('Please select image files');
-          }else if(dataFieldsTemp.numberOfRealImages > 0 && !jsonSelected){
+          }else if(dataFieldsTemp.numberOfRealImages > 0 && !jsonSelected && jsonUploadNeeded){
             alert('Please select a json file');
           }else{
             setParameters();
@@ -323,8 +324,7 @@ function Landing(props) {
       galleryNode.removeChild(galleryNode.lastChild);
     }
     for (var i=0; i < event.target.files.length; i++){
-      // bodyFormDataImages.append(event.target.files[i].name, event.target.files[i]); // 'image' + i.toString()
-      bodyFormDataImages.append("photos", event.target.files[i]); // 'image' + i.toString()
+      bodyFormDataImages.append("photos", event.target.files[i]); // the key should stay the same!
       previewFile(event.target.files[i])
     }
     sendData(bodyFormDataImages, "uploadImg");
