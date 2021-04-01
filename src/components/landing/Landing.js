@@ -235,7 +235,7 @@ function Landing(props) {
           var bodyFormDataJson = new FormData();
           bodyFormDataJson.append('name', 'obj');
           bodyFormDataJson.append('json', cur_file);
-          sendData(bodyFormDataJson, "uploadJson")
+          sendData(bodyFormDataJson, "uploadlabels")
           setJsonSelected(true);
         }
       }
@@ -395,7 +395,7 @@ function Landing(props) {
     var bodyFormData = new FormData();
     bodyFormData.append('name', 'obj');
     bodyFormData.append('json', file);
-    sendData(bodyFormData, "uploadJson");
+    sendData(bodyFormData, "uploadlabels");
   }
   
   return (
