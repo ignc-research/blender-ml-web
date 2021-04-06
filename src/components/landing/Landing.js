@@ -15,7 +15,10 @@ function Landing(props) {
   const [fileName, setfileName] = useState(''); // for drop area 1
   const [fileCount, setfileCount] = useState(0); // for drop area 2
   const [fileNameJSON, setfileNameJSON] = useState(''); // for drop area 3
-  const [trainingFinished, setTrainingFinished] = useState(''); // TODO: take the state from the server
+
+  const [trainingStarted, setTrainingStarted] = useState(false);
+  const [trainingProgress, setTrainingProgress] = useState(0); // TODO: take the state from the server
+  const [trainingFinished, setTrainingFinished] = useState(true); // TODO: take the state from the server
 
   //change the hyperlink to the website to 2D or 2.5D according to the user choice
   var website = "http://annotate.photo/"
@@ -62,25 +65,30 @@ function Landing(props) {
   }
 
   const initTrainTrig = () => {
-    var data = { 
-      start : "training",
-    }
-    //Node API test
-    axios({
-      "method": "POST",
-      "url": "http://localhost:3001/receivetraintrigger",
-      "headers": {
-        
-      }, "params": {
-        "myData": data
+    if(jsonSelected || props.objParams.numberOfRealImages === 0){ // TODO: check if the json file has been uploaded, only if an uploader is visible
+      setTrainingStarted(true)
+      var data = { 
+        start : "training",
       }
-    })
-    .then((response) => {
-      console.log(response)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+      //Node API test
+      axios({
+        "method": "POST",
+        "url": "http://localhost:3001/receivetraintrigger",
+        "headers": {
+          
+        }, "params": {
+          "myData": data
+        }
+      })
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    }else{
+      alert('Please select a json file');
+    }
   }
 
   const onChangeFields = (name, e) => {
@@ -131,7 +139,12 @@ function Landing(props) {
   }
 
   const btnClickedPrev =() => {
-    props.stepChanged(-1); // SWitch back to the initial page.
+    props.stepChanged(-1); // Switch back to the initial page.
+  }
+
+  const btnClickedRestart =() => {
+    props.stepChanged(-1); // Switch back to the initial page.
+    window.location.reload(); // reset the page
   }
 
   const sendData = (bodyFormData, name) => { // TODO: test it!
@@ -412,7 +425,7 @@ function Landing(props) {
       }
 
       {/* Progress bar */}
-      { props.noRenders !== -1 &&
+      { props.noRenders !== -1 && !trainingStarted &&
         <div className="progress-section">
           <div className="progress-bar">
             <LinearProgress variant="determinate" value={progress} />
@@ -423,7 +436,7 @@ function Landing(props) {
         </div>
       }
 
-      { progress >= 100 && // (jsonSelected || props.objParams.numberOfRealImages == 0) && // TODO: check if the json file has been uploaded, only if an uploader is visible
+      { props.noRenders !== -1 && !trainingStarted && progress >= 100 && // TODO: debug
         <h1>
           <Button
             id="train"  
@@ -510,7 +523,8 @@ function Landing(props) {
 
       {/* The json file uploader does not have to be shown, if the user has set real_images = 0. */}
       {/* dataFieldsTemp.numberOfRealImages will have here the reseted value of 0, so the passed parameters to workspace should be then passed back here (see App.js) -> props.objParams.numberOfRealImages will have the value set from the user */}
-      { props.noRenders !== -1 && props.objParams.numberOfRealImages > 0 &&
+      {/* The json file uploader should be again made invisible when the training starts. */}
+      { props.noRenders !== -1 && props.objParams.numberOfRealImages > 0 && !trainingStarted &&
         <div id="drop-area3">
           <form className="my-form">
             <br /><br /><p>Visit <a href={website} target="_blank" rel="noreferrer">annotate.photo</a> and after the manual image labeling<br /><br />upload the resulting json file<br /><br />with the file dialog or<br />
@@ -522,6 +536,32 @@ function Landing(props) {
           </form>
         </div>
       }
+
+      {/* TODO */}
+      { trainingStarted &&
+        <div className="container">
+          <div className="center set-parameters">
+            The training is running. Number of episodes: {trainingProgress}
+          </div>
+        </div>
+      }
+      { trainingStarted && trainingFinished &&
+        <div>
+          <div className="container">
+            <div className="center set-parameters">
+              Congratulations!&nbsp;
+              <a href="../test.txt" download="test.txt">Download</a>&nbsp; {/* TODO: http://localhost:3000/test.txt */}
+              your model and you are done.
+            </div>
+          </div>
+          <div className="container">
+            <div className="center">
+              <Button variant="contained" color="secondary" onClick={btnClickedRestart} startIcon={<KeyboardBackspaceIcon />}>Start all over again</Button>
+            </div>
+          </div>
+        </div>
+      }
+
     </div>
   );
 }
