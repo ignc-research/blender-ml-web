@@ -44,7 +44,7 @@ function App() {
         <Start stepChanged={stepChanged} dimensionChanged={dimensionChanged}/>
       }
       {step === 0 &&
-        <Landing noRenders={noRenders} stepChanged={stepChanged} dimension={dimension} sendOjb3dToParent={setTheObj3dForWorkspace} sendImgToParent={setTheImgForWorkspace} sendJsonToParent={setTheJsonForWorkspace} sendParamsToParent={setPramsForWorkspace}/>
+        <Landing noRenders={noRenders} stepChanged={stepChanged} dimension={dimension} sendOjb3dToParent={setTheObj3dForWorkspace} sendImgToParent={setTheImgForWorkspace} sendJsonToParent={setTheJsonForWorkspace} sendParamsToParent={setPramsForWorkspace} objParams={objParams}/>
       }
       {step === 1 &&
         <Workspace stepChanged={stepChanged} obj3d={obj3d} img={img} json={json} objParams={objParams} renderingStarted={renderingStarted}/>

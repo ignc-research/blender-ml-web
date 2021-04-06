@@ -15,7 +15,7 @@ function Landing(props) {
   const [fileName, setfileName] = useState(''); // for drop area 1
   const [fileCount, setfileCount] = useState(0); // for drop area 2
   const [fileNameJSON, setfileNameJSON] = useState(''); // for drop area 3
-  const [jsonUploadNeeded, setJsonUploadNeeded] = useState(false); // TODO: receive this state from workspace for example !?
+  const [trainingFinished, setTrainingFinished] = useState(''); // TODO: take the state from the server
 
   //change the hyperlink to the website to 2D or 2.5D according to the user choice
   var website = "http://annotate.photo/"
@@ -118,8 +118,6 @@ function Landing(props) {
         }else{
           if(dataFieldsTemp.numberOfRealImages > 0 && !imagesSelected){
             alert('Please select image files');
-          }else if(dataFieldsTemp.numberOfRealImages > 0 && !jsonSelected && jsonUploadNeeded){
-            alert('Please select a json file');
           }else{
             setParameters();
             props.stepChanged(1); // Switch to the working space.
@@ -404,11 +402,16 @@ function Landing(props) {
           <source src={backgroundVideo} type="video/mp4" />
       </video>
 
-      <div className="navigation">
-        <Button id="nav-back" variant="contained" color="secondary" onClick={btnClickedPrev} startIcon={<KeyboardBackspaceIcon />}>Back</Button>
-      </div>
+      { props.noRenders === -1 &&
+        <div className="navigation">
+          <Button id="nav-back" variant="contained" color="secondary" onClick={btnClickedPrev} startIcon={<KeyboardBackspaceIcon />}>Back</Button>
+        </div>
+      }
+      { props.noRenders !== -1 &&
+        <br />
+      }
 
-      {/* Start of progress bar */}
+      {/* Progress bar */}
       { props.noRenders !== -1 &&
         <div className="progress-section">
           <div className="progress-bar">
@@ -420,7 +423,7 @@ function Landing(props) {
         </div>
       }
 
-      {progress >= 100 &&
+      { progress >= 100 && // (jsonSelected || props.objParams.numberOfRealImages == 0) && // TODO: check if the json file has been uploaded, only if an uploader is visible
         <h1>
           <Button
             id="train"  
@@ -435,7 +438,6 @@ function Landing(props) {
           </Button>
         </h1>
       }
-      {/* End of progress bar */}
 
       { props.noRenders === -1 &&
         <div>
@@ -506,7 +508,9 @@ function Landing(props) {
         </div>
       }
 
-      { props.noRenders !== -1 &&
+      {/* The json file uploader does not have to be shown, if the user has set real_images = 0. */}
+      {/* dataFieldsTemp.numberOfRealImages will have here the reseted value of 0, so the passed parameters to workspace should be then passed back here (see App.js) -> props.objParams.numberOfRealImages will have the value set from the user */}
+      { props.noRenders !== -1 && props.objParams.numberOfRealImages > 0 &&
         <div id="drop-area3">
           <form className="my-form">
             <br /><br /><p>Visit <a href={website} target="_blank" rel="noreferrer">annotate.photo</a> and after the manual image labeling<br /><br />upload the resulting json file<br /><br />with the file dialog or<br />
