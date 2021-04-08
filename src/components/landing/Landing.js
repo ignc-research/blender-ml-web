@@ -41,7 +41,7 @@ function Landing(props) {
   const getProgress = () => {
     axios({
       "method": "GET",
-      "url": "http://localhost:3001/progress",
+      "url": "http://localhost:3001/getrenderprogress",
       "headers": {
         
       }
