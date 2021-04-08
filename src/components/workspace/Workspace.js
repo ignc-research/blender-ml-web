@@ -15,6 +15,7 @@ import Button from '@material-ui/core/Button';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Slide from '@material-ui/core/Slide';
 
 
 var hasGui = false;
@@ -141,9 +142,6 @@ function Workspace(props) {
     const radiusFolder = gui.addFolder('Set Radius');
     radiusFolder.add(objSphereBound.geometry.parameters, 'radius', 0, 30).name('Min Radius').onChange(function () {
       objRadius = objSphereBound.geometry.parameters.radius;
-      console.log(camera.position.x);
-      console.log(camera.position.y);
-      console.log(camera.position.z);
       objSphereBound.scale.x = objRadius;
       objSphereBound.scale.y = objRadius;
       objSphereBound.scale.z = objRadius;
@@ -164,9 +162,11 @@ function Workspace(props) {
     // coordinateFolder.add(camera.position, "y", ymin, ymax, 0.01).listen();
     // coordinateFolder.add(camera.position, "z", zmin, zmax, 0.01).listen();
 
-    const rotationFolder = gui.addFolder("Rotation");
-    rotationFolder.add(camera.rotation, "x", -Math.PI * 2, Math.PI * 2, 0.01);
-    rotationFolder.add(camera.rotation, "y", -Math.PI * 2, Math.PI * 2, 0.01);
+    // const rotationFolder = gui.addFolder("Rotation");
+    // rotationFolder.add(camera.rotation, "x", -Math.PI * 2, Math.PI * 2, 0.01);
+    // rotationFolder.add(camera.rotation, "y", -Math.PI * 2, Math.PI * 2, 0.01);
+
+    // console.log(camera);
 
 
     // coordinateFolder.open()
@@ -416,10 +416,15 @@ function Workspace(props) {
   }
   // go back to landing page button setting
   const btnClicked = () => {
-    props.stepChanged(0);
+    setChecked(false);
+    setTimeout(() => {
+      props.stepChanged(0);
+    }, 500)
+    
   }
 
   const [disabled, setDisabled] = useState(false);
+  const [checked, setChecked] = useState(true);
   const initRenderTrig = () => {
     // setDisabled(true);
     initData();
@@ -498,6 +503,7 @@ function Workspace(props) {
   }
 
   return (
+    <Slide direction="up" in={checked} mountOnEnter unmountOnExit>
     <div className="App">
       <div className="nav">
         <Button 
@@ -562,6 +568,7 @@ function Workspace(props) {
       }
 
     </div>
+    </Slide>
   );
 
 }
