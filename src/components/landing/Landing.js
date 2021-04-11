@@ -17,8 +17,9 @@ function Landing(props) {
   const [fileNameJSON, setfileNameJSON] = useState(''); // for drop area 3
 
   const [trainingStarted, setTrainingStarted] = useState(false);
-  const [trainingProgress, setTrainingProgress] = useState(0); // TODO: take the state from the server
-  const [trainingFinished, setTrainingFinished] = useState(true); // TODO: take the state from the server
+  const [trainingEpisodes, setTrainingEpisodes] = useState(0);
+  const [trainingLoss, setTrainingLoss] = useState(0.0);
+  const [trainingFinished, setTrainingFinished] = useState(false);
 
   //change the hyperlink to the website to 2D or 2.5D according to the user choice
   var website = "http://annotate.photo/"
@@ -29,22 +30,20 @@ function Landing(props) {
   const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfRenders:10, numberOfRealImages:0, train_test_split:'5/5'});
   const [dataFields, setDataFields] = useState({numberOfRenders:0, numberOfRealImages:0, train_test_split:0});
   
-  var getProgressInterval = null;
+  var getRenderingProgressInterval = null;
   const [progress, setProgress] = useState(0);
   // For progress bar, when "Rendering" started 
   const renderingStarted = () => {
-      getProgressInterval = setInterval(() => {
-        getProgress()
+      getRenderingProgressInterval = setInterval(() => {
+        getRenderingProgress()
       }, 2000);
   }
 
-  const getProgress = () => {
+  const getRenderingProgress = () => {
     axios({
       "method": "GET",
-      "url": "http://localhost:3001/getrenderprogress",
-      "headers": {
-        
-      }
+      "url": "http://localhost:3001/progress",
+      "headers": {}
     })
     .then((response) => {
       var value = (parseInt(response.data) - 0) * 100 / (props.noRenders - 0);
@@ -52,7 +51,7 @@ function Landing(props) {
       // setProgress(parseInt(response.data))
 
       if(parseInt(response.data)/props.noRenders >= 1){
-        clearInterval(getProgressInterval);
+        clearInterval(getRenderingProgressInterval);
       }
     })
     .catch((error) => {
@@ -65,7 +64,7 @@ function Landing(props) {
   }
 
   const initTrainTrig = () => {
-    if(jsonSelected || props.objParams.numberOfRealImages === 0){ // TODO: check if the json file has been uploaded, only if an uploader is visible
+    if(jsonSelected || props.objParams.numberOfRealImages === 0){ // check if the json file has been uploaded, only if an uploader is visible
       setTrainingStarted(true)
       var data = { 
         start : "training",
@@ -86,9 +85,28 @@ function Landing(props) {
       .catch((error) => {
         console.log(error)
       })
+      getTrainingProgress()
     }else{
       alert('Please select a json file');
     }
+  }
+
+  const getTrainingProgress = () => { // TODO: check!
+    console.log('TEST')
+    axios({
+      "method": "GET",
+      "url": "http://localhost:3001/progresstraining",
+      "headers": {}
+    })
+    .then((response) => {
+      var episodes = parseInt(response.data.episodes);
+      var loss = parseFloat(response.data.loss);
+      setTrainingEpisodes(episodes)
+      setTrainingLoss(loss)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
   }
 
   const onChangeFields = (name, e) => {
@@ -147,10 +165,33 @@ function Landing(props) {
     window.location.reload(); // reset the page
   }
 
-  const sendData = (bodyFormData, name) => { // TODO: test it!
+  const btnClickedStopTraining = () => { // TODO: check!
+    var data = { 
+      end : "training",
+    }
+    //Node API test
     axios({
       "method": "POST",
-      "url": "http://localhost:3001/" + name, // upload3d, uploadImg, uploadJson
+      "url": "http://localhost:3001/receivetrainstop",
+      "headers": {
+        
+      }, "params": {
+        "myData": data
+      }
+    })
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+    setTrainingFinished(true)
+  }
+
+  const sendData = (bodyFormData, name) => { // test it!
+    axios({
+      "method": "POST",
+      "url": "http://localhost:3001/" + name, // name = 'upload3d', 'uploadImg', 'uploadJson'
       "data": bodyFormData,
       "headers": {'Content-Type': 'multipart/form-data' }
     })
@@ -264,7 +305,7 @@ function Landing(props) {
     }
   }
 
-  const dragAndDropAreaDefault = event => { // TODO: use the progress bar?
+  const dragAndDropAreaDefault = event => { // TODO: use the progress bar? -> it has to be changed to listen to our server
     let dropArea = document.getElementById('drop-area')
     let uploadProgress = [] // track the percentage completion of each request instead of just how many are done
     let progressBar = document.getElementById('progress-bar')
@@ -321,7 +362,7 @@ function Landing(props) {
       xhr.open('POST', url, true)
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
       
-      // TODO: The progress bar will then show how much it takes to upload it to a cloud, but not to our server, it will still be very fast, so could be still used for showing an approximate time.
+      // The progress bar will then show how much it takes to upload it to a cloud, but not to our server, it will still be very fast, so could be still used for showing an approximate time.
       // Update progress (can be used to show progress indicator)
       xhr.upload.addEventListener("progress", function(e) {
         updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
@@ -471,7 +512,6 @@ function Landing(props) {
             </div>
           </div>
 
-          {/* TODO: Make sure that the parameter 'train_test_split' is correctly received by the backend! */}
           <div className="container">
             <div className="center set-parameters">
               Amount of by blender generated images:&nbsp;
@@ -537,25 +577,64 @@ function Landing(props) {
         </div>
       }
 
-      {/* TODO */}
       { trainingStarted &&
-        <div className="container">
-          <div className="center set-parameters">
-            The training is running. Number of episodes: {trainingProgress}
+        <div>
+          <div className="container-small">
+            <div className="center set-parameters">
+              <h3>The training is running...</h3>
+            </div>
           </div>
+          <div className="container-small">
+            <div className="center set-parameters">
+              You can download your model at any time now, as many times as you want to check it out.
+            </div>
+          </div>
+          <div className="container-small">
+            <div className="center set-color-red">
+              Current number of episodes: {trainingEpisodes}
+            </div>
+          </div>
+          <div className="container-small">
+            <div className="center set-color-red">
+              Current model loss: {trainingLoss}
+            </div>
+          </div>
+          <br />
+          <div className="container-small">
+            <div className="center">
+              <a id="download_href" href="../model.pth" download="model.pth">Download</a> {/* TODO: listens to http://localhost:3000/model.pth; if needed correct the path in 'href' */}
+            </div>
+          </div>
+          <br />
+          <div className="container-small">
+            <div className="center set-parameters">
+              When you are fine with the model, please stop the training process and download your final model.
+            </div>
+          </div>
+          <br />
+          <div className="container-small">
+            <div className="center">
+            <input type="button" id="stop_button" onClick={btnClickedStopTraining}/>
+            <label className="button" htmlFor="stop_button">Stop the training</label>
+            </div>
+          </div>
+          <br /><br />
         </div>
       }
       { trainingStarted && trainingFinished &&
         <div>
-          <div className="container">
+          <div className="container-small">
             <div className="center set-parameters">
-              Congratulations!&nbsp;
-              <a href="../test.txt" download="test.txt">Download</a>&nbsp; {/* TODO: http://localhost:3000/test.txt */}
-              your model and you are done.
+              <h3>Congratulations!</h3>
             </div>
           </div>
-          <div className="container">
-            <div className="center">
+          <div className="container-small">
+            <div className="center set-parameters">
+              You are done. Thank you for using our website.
+            </div>
+          </div>
+          <div className="container-small">
+            <div className="center set-parameters">
               <Button variant="contained" color="secondary" onClick={btnClickedRestart} startIcon={<KeyboardBackspaceIcon />}>Start all over again</Button>
             </div>
           </div>

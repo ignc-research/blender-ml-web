@@ -8,7 +8,7 @@
   left: 0;
 }
 
-.button, input {
+.button, input, #download_href {
   background-color: white;
   border: 2px solid #777;
   border-radius: 4px;
@@ -124,7 +124,7 @@ h1 {
   margin-right: 10px;
   vertical-align: middle;
 }
-#fileElem {
+#fileElem, #stop_button {
   display: none;
 }
 #fileElem2 {
@@ -142,6 +142,11 @@ h1 {
   position: relative;
 }
 
+.container-small { 
+  height: 40px;
+  position: relative;
+}
+
 .center {
   margin: 0;
   position: absolute;
@@ -153,6 +158,10 @@ h1 {
 
 .set-parameters {
   color: white;
+}
+
+.set-color-red {
+  color: red;
 }
 
 .tooltip {
