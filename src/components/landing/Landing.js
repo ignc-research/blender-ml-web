@@ -19,6 +19,7 @@ function Landing(props) {
   const [trainingStarted, setTrainingStarted] = useState(false);
   const [trainingEpisodes, setTrainingEpisodes] = useState(0);
   const [trainingLoss, setTrainingLoss] = useState(0.0);
+  const [trainingRunning, setTrainingRunning] = useState(false);
   const [trainingFinished, setTrainingFinished] = useState(false);
 
   //change the hyperlink to the website to 2D or 2.5D according to the user choice
@@ -60,12 +61,12 @@ function Landing(props) {
   }
 
   if(props.noRenders !== -1) {
-    renderingStarted();
+    //renderingStarted();
+    console.log('The rendering is running..')
   }
 
   const initTrainTrig = () => {
     if(jsonSelected || props.objParams.numberOfRealImages === 0){ // check if the json file has been uploaded, only if an uploader is visible
-      setTrainingStarted(true)
       var data = { 
         start : "training",
       }
@@ -85,14 +86,15 @@ function Landing(props) {
       .catch((error) => {
         console.log(error)
       })
-      getTrainingProgress()
+      setTrainingStarted(true)
+      setTrainingRunning(true)
+      
     }else{
       alert('Please select a json file');
     }
   }
 
-  const getTrainingProgress = () => { // TODO: check!
-    console.log('TEST')
+  const getTrainingProgress = () => {
     axios({
       "method": "GET",
       "url": "http://localhost:3001/progresstraining",
@@ -107,6 +109,11 @@ function Landing(props) {
     .catch((error) => {
       console.log(error)
     })
+  }
+
+  if(trainingRunning === true) { // TODO: check!
+    getTrainingProgress();
+    console.log('The training is running..')
   }
 
   const onChangeFields = (name, e) => {
@@ -165,7 +172,7 @@ function Landing(props) {
     window.location.reload(); // reset the page
   }
 
-  const btnClickedStopTraining = () => { // TODO: check!
+  const btnClickedStopTraining = () => {
     var data = { 
       end : "training",
     }
@@ -186,6 +193,7 @@ function Landing(props) {
       console.log(error)
     })
     setTrainingFinished(true)
+    setTrainingRunning(false)
   }
 
   const sendData = (bodyFormData, name) => { // test it!
@@ -602,7 +610,7 @@ function Landing(props) {
           <br />
           <div className="container-small">
             <div className="center">
-              <a id="download_href" href="../model.pth" download="model.pth">Download</a> {/* TODO: listens to http://localhost:3000/model.pth; if needed correct the path in 'href' */}
+              <a id="download_href" href="../model.pth" download="model.pth">Download</a> {/* listens to http://localhost:3000/model.pth; if needed correct the path in 'href' */}
             </div>
           </div>
           <br />
