@@ -28,7 +28,7 @@ function Landing(props) {
   if(props.dimension === 2.5) website = "http://3d-on-2d.annotate.photo/"
 
   //input parameters 
-  const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfRenders:10, numberOfRealImages:0, train_test_split:'5/5'});
+  const [dataFieldsTemp, setDataFieldsTemp] = useState({numberOfRenders:10, numberOfRealImages:0, train_test_split:'80/20'});
   const [dataFields, setDataFields] = useState({numberOfRenders:0, numberOfRealImages:0, train_test_split:0});
   
   var getRenderingProgressInterval = null;
@@ -43,7 +43,7 @@ function Landing(props) {
   const getRenderingProgress = () => {
     axios({
       "method": "GET",
-      "url": "http://localhost:3001/progress",
+      "url": "http://localhost:3001/getrenderprogress",
       "headers": {}
     })
     .then((response) => {
@@ -104,11 +104,12 @@ function Landing(props) {
   const getTrainingProgress = () => {
     axios({
       "method": "GET",
-      "url": "http://localhost:3001/progresstraining",
+      "url": "http://localhost:3001/gettrainprogress",
       "headers": {}
     })
     .then((response) => {
-      var episodes = parseInt(response.data.episodes);
+      console.log(response)
+      var episodes = parseInt(response.data.episode);
       var loss = parseFloat(response.data.loss);
       setTrainingEpisodes(episodes)
       setTrainingLoss(loss)
@@ -140,7 +141,7 @@ function Landing(props) {
     setDataFields({...dataFields,numberOfRealImages:dataFieldsTemp.numberOfRealImages})
     let train_test_split_float = 0.0
     if (dataFieldsTemp.train_test_split.split('/').length === 2) {
-      train_test_split_float = parseFloat(dataFieldsTemp.train_test_split.split('/')[0])/parseFloat(dataFieldsTemp.train_test_split.split('/')[1])
+      train_test_split_float = parseFloat(dataFieldsTemp.train_test_split.split('/')[0])/100 //parseFloat(dataFieldsTemp.train_test_split.split('/')[1])
     }
     setDataFields({...dataFields,train_test_split:train_test_split_float})
     
@@ -621,7 +622,7 @@ function Landing(props) {
           <br />
           <div className="container-small">
             <div className="center">
-              <a id="download_href" href="../model.pth" download="model.pth">Download</a> {/* listens to http://localhost:3000/model.pth; if needed correct the path in 'href' */}
+              <a id="download_href" href="http://localhost:3001/model.pth" download="model.pth">Download</a> {/* listens to http://localhost:3000/model.pth; if needed correct the path in 'href' */}
             </div>
           </div>
           <br />
