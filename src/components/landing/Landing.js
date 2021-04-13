@@ -61,7 +61,7 @@ function Landing(props) {
   }
 
   if(props.noRenders !== -1) {
-    //renderingStarted();
+    renderingStarted();
     console.log('The rendering is running..')
   }
 
@@ -94,6 +94,13 @@ function Landing(props) {
     }
   }
 
+  var getTrainingProgressInterval = null;
+  const trainStarted = () => {
+    getTrainingProgressInterval = setInterval(() => {
+      getTrainingProgress()
+    }, 2000);
+  }
+
   const getTrainingProgress = () => {
     axios({
       "method": "GET",
@@ -105,6 +112,9 @@ function Landing(props) {
       var loss = parseFloat(response.data.loss);
       setTrainingEpisodes(episodes)
       setTrainingLoss(loss)
+      if (trainingRunning === false){ // TODO: trainingRunning is here stil not updated, so it will not go inside!?
+        clearInterval(getTrainingProgressInterval);
+      }
     })
     .catch((error) => {
       console.log(error)
@@ -112,7 +122,8 @@ function Landing(props) {
   }
 
   if(trainingRunning === true) { // TODO: check!
-    getTrainingProgress();
+    //getTrainingProgress();
+    trainStarted()
     console.log('The training is running..')
   }
 
@@ -173,6 +184,8 @@ function Landing(props) {
   }
 
   const btnClickedStopTraining = () => {
+    setTrainingFinished(true)
+    setTrainingRunning(false)
     var data = { 
       end : "training",
     }
@@ -192,8 +205,6 @@ function Landing(props) {
     .catch((error) => {
       console.log(error)
     })
-    setTrainingFinished(true)
-    setTrainingRunning(false)
   }
 
   const sendData = (bodyFormData, name) => { // test it!
