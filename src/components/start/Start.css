@@ -75,7 +75,9 @@ img {
   color: lightcyan;
 }
 
-
+.about h2, .work-flow h2 {
+  font-size: 42px;
+}
 .about, .work-flow {
   background-color: #fff;
   padding-top: 30px;
@@ -95,9 +97,11 @@ img {
 }
 .about .tile-container .tile .tile-image {
   padding: 36px 120px;
+  height: 200px;
+  display: flex;
 }
 .about .tile-container .tile .tile-image img {
-  min-height: 136px;
+  align-self: center;
 }
 
 .about .tile-container .tile .tile-text {
@@ -106,7 +110,7 @@ img {
 }
 
 .work-flow {
-  padding-top: 56px;
+  padding-top: 100px;;
   padding-bottom: 56px;
 }
 .work-flow .howitworks-image {
