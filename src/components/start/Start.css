@@ -8,7 +8,7 @@
     left: 0;
   }
 
-  #button-get-started {
+  /* #button-get-started {
     background-color: white;
     border: 2px solid #777;
     border-radius: 4px;
@@ -20,7 +20,7 @@
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
-  }
+  } */
 
   #get-started {
     display: none;
@@ -42,3 +42,109 @@
     text-align: center;
     vertical-align: middle;
   }
+
+
+/* Begin ======================= css =======================  */
+h1, h2 {
+  margin: 0;
+  width: 40%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+img {
+  max-width: 100%;
+    height: auto;
+    display: block;
+}
+.Start {
+  padding-bottom: 180px;
+}
+.header {
+  padding: 90px 36px;
+  background: url('inline_image_preview.jpeg') no-repeat center center fixed;
+  background-size: 100% 100%;
+}
+.header h1 {
+  color: lightcyan;
+}
+.header p {
+  width: 40%;
+  margin: 20px auto;
+  line-height: 24px;
+  color: lightcyan;
+}
+
+
+.about, .work-flow {
+  background-color: #fff;
+  padding-top: 30px;
+}
+.about .tile-container {
+  display: flex;
+  margin-top: 18px;
+  padding: 0 100px;
+}
+
+.about .tile-container .tile {
+  display: flex;
+  flex-basis: auto;
+  flex-direction: column;
+  width: 33%;
+  margin-right: 16px;
+}
+.about .tile-container .tile .tile-image {
+  padding: 36px 120px;
+}
+.about .tile-container .tile .tile-image img {
+  min-height: 136px;
+}
+
+.about .tile-container .tile .tile-text {
+  text-align: center;
+  padding: 0 40px;
+}
+
+.work-flow {
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+.work-flow .howitworks-image {
+  width: 100%;
+  margin-top: 36px;
+  background-color: #F8F8F8;
+}
+.work-flow .howitworks-image img {
+  margin: 0 auto;
+}
+
+.get-started-section {
+  background-color: #031219;;
+    padding: 20px 0;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    color: #fff;
+}
+.get-started-section p {
+  margin: 12px auto;
+  line-height: 24px;
+}
+
+.get-started-section .button-container {
+  text-align: center;
+  margin-top: 32px;
+}
+
+.get-started-section .button-container button {
+  margin-right: 36px;
+  padding: 8px 44px;
+}
+
+
+
+
+
+
+/* End ======================= css =======================  */
