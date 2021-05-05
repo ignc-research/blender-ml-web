@@ -33,3 +33,11 @@ Even though for the user it seems like a smooth workflow, all three components w
 <p align="center">
   <img src="public/images/frontend_internal_connections.png">
 </p>
+
+## Communication with the rest of the project
+
+The connection between the [Frontend](https://github.com/ignc-research/blender-ml-web/tree/develop) and the [Backend](https://github.com/ignc-research/blender-ml-docker/tree/develop) is done using the [Node.js server](https://github.com/subhinlee/IAS-Project-Node/tree/master). From the Frontend site, the 3D object, optionally the real images and all parameters for the training are send to the server and the update on rendering and training, as well as the trained model itself are send back to the Frontend. A full list of all connections between Frontend and Backend via Node.js are visualized in the following diagram.
+
+<p align="center">
+  <img src="public/images/frontend_connections.png">
+</p>
