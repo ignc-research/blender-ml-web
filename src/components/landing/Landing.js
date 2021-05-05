@@ -6,7 +6,6 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
-//import e from 'cors';
 
 function Landing(props) {
   const [fileSelected, setFileSelected] = useState(false);
