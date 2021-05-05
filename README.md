@@ -1,7 +1,7 @@
 ## Overview
 We present a standalone application for 2.5D object tracking in industrial environments. We created an user interface for easier working with Blender-Gen for rendering and SSPE for training. The necessary user input is a basic parameter setting, as well us uploading of a 3D model and optionally a set of real images. The outcome is a model weight, ready to be used for the current use case. Our website automates the whole process, so that the user do not need technical background of how to start and bind every single process, but he or she simply needs to follow the basic instructions on the website and wait until everything is set up, ran and ready to be used.
 
-**Attention:** This repository presents only the Frontend side of the whole web application. Please visit https://github.com/subhinlee/IAS-Project-Node/tree/master for the Node.js server and https://github.com/ignc-research/blender-ml-docker/tree/develop for the Backend side.
+**Attention:** This repository presents only the Frontend side of the whole web application. Please visit https://github.com/ignc-research/blender-ml-server for the Node.js server and https://github.com/ignc-research/blender-ml-docker for the Backend side.
 
 ## Requirements
 The application (the frontend side of the whole pipeline) can be run on every operating system. We recommend installing and using [VS Code](https://code.visualstudio.com/download). All of the necessary libraries will be automatically installed, when you follow the instructions in the 'How to run' section. That is why the first time you set it up it could take some time.
@@ -36,7 +36,7 @@ Even though for the user it seems like a smooth workflow, all three components w
 
 ## Communication with the rest of the project
 
-The connection between the [Frontend](https://github.com/ignc-research/blender-ml-web/tree/develop) and the [Backend](https://github.com/ignc-research/blender-ml-docker/tree/develop) is done using the [Node.js server](https://github.com/subhinlee/IAS-Project-Node/tree/master). From the Frontend site, the 3D object, optionally the real images and all parameters for the training are send to the server and the update on rendering and training, as well as the trained model itself are send back to the Frontend. A full list of all connections between Frontend and Backend via Node.js are visualized in the following diagram.
+The connection between the [Frontend](https://github.com/ignc-research/blender-ml-web) and the [Backend](https://github.com/ignc-research/blender-ml-docker) is done using the [Node.js server](https://github.com/ignc-research/blender-ml-server). From the Frontend site, the 3D object, optionally the real images and all parameters for the training are send to the server and the update on rendering and training, as well as the trained model itself are send back to the Frontend. A full list of all connections between Frontend and Backend via Node.js are visualized in the following diagram.
 
 <p align="center">
   <img src="public/images/frontend_connections.png">
