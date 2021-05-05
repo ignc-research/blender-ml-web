@@ -112,7 +112,7 @@ function Landing(props) {
       var loss = parseFloat(response.data.loss);
       setTrainingEpisodes(episodes)
       setTrainingLoss(loss)
-      if (trainingRunning === false){ // TODO: trainingRunning is here stil not updated, so it will not go inside!?
+      if (trainingRunning === false){
         clearInterval(getTrainingProgressInterval);
       }
     })
@@ -121,8 +121,7 @@ function Landing(props) {
     })
   }
 
-  if(trainingRunning === true) { // TODO: check!
-    //getTrainingProgress();
+  if(trainingRunning === true) {
     trainStarted()
     console.log('The training is running..')
   }
@@ -140,7 +139,7 @@ function Landing(props) {
     setDataFields({...dataFields,numberOfRealImages:dataFieldsTemp.numberOfRealImages})
     let train_test_split_float = 0.0
     if (dataFieldsTemp.train_test_split.split('/').length === 2) {
-      train_test_split_float = parseFloat(dataFieldsTemp.train_test_split.split('/')[0])/100 //parseFloat(dataFieldsTemp.train_test_split.split('/')[1])
+      train_test_split_float = parseFloat(dataFieldsTemp.train_test_split.split('/')[0])/100
     }
     setDataFields({...dataFields,train_test_split:train_test_split_float})
     
@@ -207,7 +206,7 @@ function Landing(props) {
     })
   }
 
-  const sendData = (bodyFormData, name) => { // test it!
+  const sendData = (bodyFormData, name) => {
     axios({
       "method": "POST",
       "url": "http://localhost:3001/" + name, // name = 'upload3d', 'uploadImg', 'uploadJson'
@@ -324,111 +323,6 @@ function Landing(props) {
     }
   }
 
-  const dragAndDropAreaDefault = event => { // TODO: use the progress bar? -> it has to be changed to listen to our server
-    let dropArea = document.getElementById('drop-area')
-    let uploadProgress = [] // track the percentage completion of each request instead of just how many are done
-    let progressBar = document.getElementById('progress-bar')
-    
-    // Prevent default drag behaviours, otherwise the browser will end up opening the dropped file instead of sending it along to the drop event handler!
-    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      let dropArea = document.getElementById('drop-area')
-      dropArea.addEventListener(eventName, preventDefaults, false)   
-      document.body.addEventListener(eventName, preventDefaults, false)
-    })
-
-    function preventDefaults (e) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-    
-    // Add an indicator to let the user know that they have indeed dragged the item over the correct area by using CSS to change the color of the border color of the drop area.
-    ;['dragenter', 'dragover'].forEach(eventName => {
-      dropArea.addEventListener(eventName, highlight, false)
-    })
-
-    ;['dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, unhighlight, false)
-    })
-
-    function highlight(e) {
-      dropArea.classList.add('highlight')
-    }
-
-    function unhighlight(e) {
-      dropArea.classList.remove('highlight')
-    }
-    
-    // Handle dropped files
-    dropArea.addEventListener('drop', handleDrop, false)
-
-    function handleDrop(e) {
-      let dt = e.dataTransfer
-      let files = dt.files
-      handleFiles(files)
-    }
-
-    function handleFiles(files) {
-      files = [...files]
-      initializeProgress(files.length)
-      files.forEach(uploadFile)
-    }
-
-    function uploadFile(file, i) {
-      //var url = 'YOUR URL HERE' // change the URL to work with the back-end or service
-      var url = 'https://api.cloudinary.com/v1_1/magdalena/image/upload' // to test with a free cloudinary account (works only for images, not for ply files)
-      var xhr = new XMLHttpRequest() // to support Internet Explorer
-      var formData = new FormData()
-      xhr.open('POST', url, true)
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
-      
-      // The progress bar will then show how much it takes to upload it to a cloud, but not to our server, it will still be very fast, so could be still used for showing an approximate time.
-      // Update progress (can be used to show progress indicator)
-      xhr.upload.addEventListener("progress", function(e) {
-        updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
-      })
-
-      xhr.addEventListener('readystatechange', function(e) {
-        // Depending on how the server is set up, different ranges of status numbers rather than just 200 may also be checked
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          updateProgress(i, 100)
-          // Done. Inform the user
-        }
-        else if (xhr.readyState === 4 && xhr.status !== 200) {
-          // Error. Inform the user
-        }
-      })
-
-      formData.append('upload_preset', 'pworvx7a') // preset name: pworvx7a, ml_default
-      formData.append('file', file) // update, if the server needs more information
-      xhr.send(formData)
-
-      setFileSelected(true);
-      setfileName(file.name)
-      props.sendOjb3dToParent(file);
-      var bodyFormData = new FormData();
-      bodyFormData.append('name', 'obj');
-      bodyFormData.append('obj3d', file);
-      sendData(bodyFormData, "upload3d");
-    }
-    
-    // Tracking Progress
-    function initializeProgress(numFiles) {
-      progressBar.value = 0
-      uploadProgress = []
-
-      for(let i = numFiles; i > 0; i--) {
-      uploadProgress.push(0)
-      }
-    }
-
-    function updateProgress(fileNumber, percent) {
-      uploadProgress[fileNumber] = percent
-      let total = uploadProgress.reduce((tot, curr) => tot + curr, 0) / uploadProgress.length
-      console.debug('update', fileNumber, percent, total)
-      progressBar.value = total
-    }
-  }
-
   //When file selected, post it to server
   const onChangeHandler = event => {
     let file = event.target.files[0]
@@ -496,15 +390,13 @@ function Landing(props) {
         </div>
       }
 
-      { props.noRenders !== -1 && !trainingStarted && progress >= 100 && // TODO: debug
+      { props.noRenders !== -1 && !trainingStarted && progress >= 100 && // Debugging: when running without the backend, commend out '&& progress >= 100' to be able to proceed and just see the pipeline
         <h1>
           <Button
             id="train"  
             onClick={initTrainTrig} 
             variant="contained"
             color="default"
-            // disabled={React.state.disabled}
-            // className={classes.button}
             endIcon={<DoubleArrowIcon  />}
           >
             Start Training
@@ -538,7 +430,6 @@ function Landing(props) {
               <span className="btn btn-secondary tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Set the amount of by blender generated images to an integer number bigger or equal to zero.">Info</span>
             </div>
           </div>
-          {/*TODO: better ask: real images yes or no and calculate here the uploaded images and send this number to backend if necessary OR give at least an error if the number of images given and uploaded do not match*/}
           <div className="container">
             <div className="center set-parameters">
               Amount of real images:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -565,9 +456,7 @@ function Landing(props) {
                 <br /><input type="file" name="file" id="fileElem2" multiple accept="image/*" onChange={onChangeHandler2}/>
                 <label className="button" htmlFor="fileElem2">Select some files</label>
                 &nbsp;{fileCount}&nbsp;file/s uploaded
-                <br /><br /><progress id="progress-bar" max="100" value="0"></progress>
-                {/* TODO: A progress bar with our service! For now it is hided. The progress bar should be also working with the file dialog. See dragAndDropAreaDefault(). */}
-                <div id="gallery"></div>
+                <br /><br /><div id="gallery"></div>
               </form>
             </div>
           }
@@ -621,7 +510,7 @@ function Landing(props) {
           <br />
           <div className="container-small">
             <div className="center">
-              <a id="download_href" href="http://localhost:3001/model.pth" download="model.pth">Download</a> {/* listens to http://localhost:3000/model.pth; if needed correct the path in 'href' */}
+              <a id="download_href" href="http://localhost:3001/model.pth" download="model.pth">Download</a> {/* listens to http://localhost:3000/model.pth */}
             </div>
           </div>
           <br />
