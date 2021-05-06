@@ -31,7 +31,7 @@ function Start(props) {
                 <div className="tile-container">
                     <div className="tile">
                         <div className="tile-image">
-                            <img src="/images/blender.png"></img>
+                            <img src="/images/blender.png" alt=""></img>
                         </div>
                         <div className="tile-text">
                             Generate labeled images using blender script automatically.
@@ -39,7 +39,7 @@ function Start(props) {
                     </div>
                     <div className="tile">
                         <div className="tile-image">
-                            <img src="/images/artificial-intelligence.png"></img>
+                            <img src="/images/artificial-intelligence.png" alt=""></img>
                         </div>
                         <div className="tile-text">
                             6D pose estimation will get trained based on user's configuration.
@@ -47,7 +47,7 @@ function Start(props) {
                     </div>
                     <div className="tile">
                         <div className="tile-image">
-                            <img src="/images/annotate.png"></img>
+                            <img src="/images/annotate.png" alt=""></img>
                         </div>
                         <div className="tile-text">
                             Possible to add annotated dataset for neural weight using Annotate.photo 
@@ -59,7 +59,7 @@ function Start(props) {
             <div className="work-flow">
                  <h2>How it works</h2>
                  <div className="howitworks-image">
-                     <img src="/images/howitworks.png"></img>
+                     <img src="/images/howitworks.png" alt=""></img>
                  </div>
             </div>
 

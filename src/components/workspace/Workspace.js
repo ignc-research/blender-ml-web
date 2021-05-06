@@ -6,9 +6,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/dat.gui.module';
 import { Spherical } from 'three/src/math/Spherical.js';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
-import MinMaxGUIHelper from '../../helpers/MinMaxGUIHelper';
+//import MinMaxGUIHelper from '../../helpers/MinMaxGUIHelper';
 import axios from 'axios';
-
 import Button from '@material-ui/core/Button';
 // import { makeStyles } from '@material-ui/core/styles';
 // import Icon from '@material-ui/core/Icon';
@@ -17,10 +16,9 @@ import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Slide from '@material-ui/core/Slide';
 
-
-var hasGui = false;
+//var hasGui = false;
 function Workspace(props) {
-  var getProgressInterval = null;
+  //var getProgressInterval = null;
   const [progress, setProgress] = useState(0);
   const noRenders = parseInt(props.objParams.numberOfRenders);
 
@@ -96,8 +94,6 @@ function Workspace(props) {
     // cameraFolder.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near');
     // cameraFolder.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
     
-
-  
     // const controls = new OrbitControls(camera, view1Elem);
     // controls.maxPolarAngle = Math.PI/2; 
     // controls.target.set(0, 0, 0);
@@ -121,7 +117,6 @@ function Workspace(props) {
     scene.background = new THREE.Color('black');
     scene.add(cameraHelper);
     
-  
     const objGeometry = new THREE.SphereGeometry( objRadius, 32, 32 );
     const objMaterial = new THREE.MeshBasicMaterial( { color: 0xffc000, wireframe: true, transparent: true } );
     const objSphereBound = new THREE.Mesh( objGeometry, objMaterial );
@@ -168,18 +163,15 @@ function Workspace(props) {
 
     // console.log(camera);
 
-
     // coordinateFolder.open()
     var guiContainer = document.getElementById('gui-container');
     guiContainer.appendChild(gui.domElement);
-
-
 
     THREE.Object3D.DefaultUp = new THREE.Vector3(0,0,1);
     
     {
       const planeSize = 100;
-  
+
       const loader = new THREE.TextureLoader();
       const texture = loader.load('/checker.png');
       texture.wrapS = THREE.RepeatWrapping;
@@ -254,8 +246,7 @@ function Workspace(props) {
           
       }; 
       reader.readAsText(file3d)     
-  
-  
+      
     {
       const color = 0xFFFFFF;
       const intensity = 1;
@@ -275,7 +266,6 @@ function Workspace(props) {
       scene.add(gridXY);
     }
 
-    
     // resize renderer to screen
     function resizeRendererToDisplaySize(renderer) {
       const canvas = renderer.domElement;
@@ -327,7 +317,6 @@ function Workspace(props) {
         camera.updateProjectionMatrix();
         cameraHelper.update();
 
-  
         // don't draw the camera helper in the original view
         cameraHelper.visible = false;
         axes.visible = false;
@@ -348,7 +337,6 @@ function Workspace(props) {
         camera2.aspect = aspect;
         camera2.updateProjectionMatrix();
       
-    
         // draw the camera helper in the 2nd view
         cameraHelper.visible = true;
         axes.visible = true;
@@ -457,7 +445,7 @@ function Workspace(props) {
     })
   }
 
-  const getProgress = () => {
+  /*const getProgress = () => {
     axios({
       "method": "GET",
       "url": "http://localhost:3001/getrenderprogress",
@@ -477,7 +465,7 @@ function Workspace(props) {
     .catch((error) => {
       console.log(error)
     })
-  }
+  }*/
 
   const initTrainTrig = () => {
     
