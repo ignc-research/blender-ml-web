@@ -22,7 +22,7 @@ function Start(props) {
 
             <div className="header">
                 <h1>3D object tracking in industrial environments gets easier here!</h1>
-                <p class="expanded__text">We bring you a simple and great interface where you can set up basic configuration for the desired neural network weight. 
+                <p className="expanded__text">We bring you a simple and great interface where you can set up basic configuration for the desired neural network weight. 
                 A few clicks will automate the process in generating data for 6D pose estimation. Boost your data generation process here!</p>
             </div>
 

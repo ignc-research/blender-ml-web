@@ -1,25 +1,20 @@
 import './Workspace.css';
 import React, { useEffect, useState } from 'react';
 import * as THREE from "three";
-// import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/dat.gui.module';
 import { Spherical } from 'three/src/math/Spherical.js';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
-//import MinMaxGUIHelper from '../../helpers/MinMaxGUIHelper';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
-// import { makeStyles } from '@material-ui/core/styles';
-// import Icon from '@material-ui/core/Icon';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Slide from '@material-ui/core/Slide';
 
-//var hasGui = false;
 function Workspace(props) {
   //var getProgressInterval = null;
-  const [progress, setProgress] = useState(0);
+  const [progress] = useState(0);
   const noRenders = parseInt(props.objParams.numberOfRenders);
 
   useEffect(() => {
@@ -27,14 +22,6 @@ function Workspace(props) {
     
   });
 
-  // console.log("im in work space")
-  // console.log(props.obj3d)
-  // console.log("im in work space")
-
-  // const size = 1;
-  // const near = 1;
-  // const far = 1000;
-  // const camera = new THREE.OrthographicCamera(-size, size, size, -size, near, far);
   const fov = 45;
   const aspect = 2;  // the canvas default
   const near = 5;
@@ -43,13 +30,6 @@ function Workspace(props) {
 
   var objRadius = 1;
   const initThree = () => {
-    // if(hasGui)
-    //   return;
-    // hasGui = true;
-    // const [btnDisabled, setBtnDisabled] = useState(true)
-    //React.state = {
-    //  disabled: true
-    //}
 
     const canvas = document.querySelector('#c');
     const view1Elem = document.querySelector('#view1');
@@ -64,40 +44,6 @@ function Workspace(props) {
     camera.rotation.z = 90 * Math.PI / 180;
     camera.lookAt(10,10,10);
     const cameraHelper = new THREE.CameraHelper(camera);
-  
-    // const gui = new GUI({ autoPlace: false });
-    // const cameraFolder = gui.addFolder("Camera view");
-    // cameraFolder.add(camera, 'zoom', 0.05, 0.5, 0.01).listen();
-    // const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
-    // cameraFolder.add(minMaxGUIHelper, 'min', 1, 50, 0.1).name('near');
-    // cameraFolder.add(minMaxGUIHelper, 'max', 1, 50, 0.1).name('far');
-    // // cameraFolder.open()
-
-    // const coordinateFolder = gui.addFolder("Coordinates");
-    // coordinateFolder.add(camera.position, "x", xmin, xmax, 0.01);
-    // coordinateFolder.add(camera.position, "y", ymin, ymax, 0.01);
-    // coordinateFolder.add(camera.position, "z", zmin, zmax, 0.01);
-    // // coordinateFolder.open()
-    // var guiContainer = document.getElementById('gui-container');
-    // guiContainer.appendChild(gui.domElement);
-
-    // const controls = new OrbitControls(camera, view1Elem);
-    // controls.minZoom = 0.05;
-    // controls.maxZoom = 0.5;
-    // controls.maxPolarAngle = Math.PI/2; 
-    // controls.target.set(0, 0, 0);
-    // controls.update();
-    
-    // const cameraFolder = gui.addFolder("Camera view");
-    // gui.add(camera, 'fov', 1, 180);
-    // const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
-    // cameraFolder.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near');
-    // cameraFolder.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
-    
-    // const controls = new OrbitControls(camera, view1Elem);
-    // controls.maxPolarAngle = Math.PI/2; 
-    // controls.target.set(0, 0, 0);
-    // controls.update();
   
     const camera2 = new THREE.PerspectiveCamera(
       60,  // fov
@@ -152,15 +98,6 @@ function Workspace(props) {
     });
     radiusFolder.open();
 
-    // const coordinateFolder = gui.addFolder("Coordinates");
-    // coordinateFolder.add(camera.position, "x", xmin, xmax, 0.01).listen();
-    // coordinateFolder.add(camera.position, "y", ymin, ymax, 0.01).listen();
-    // coordinateFolder.add(camera.position, "z", zmin, zmax, 0.01).listen();
-
-    // const rotationFolder = gui.addFolder("Rotation");
-    // rotationFolder.add(camera.rotation, "x", -Math.PI * 2, Math.PI * 2, 0.01);
-    // rotationFolder.add(camera.rotation, "y", -Math.PI * 2, Math.PI * 2, 0.01);
-
     // console.log(camera);
 
     // coordinateFolder.open()
@@ -192,33 +129,7 @@ function Workspace(props) {
       // plane.position.y = 0;
       // plane.position.z = 0;
       scene.add(plane);
-    }
-
-    // {
-    //   var texture, loader, material, plane;
-
-    //   loader = new THREE.TextureLoader();
-    //     texture = loader.load( "./checker.png" );
-
-    //     // assuming you want the texture to repeat in both directions:
-    //     texture.wrapS = THREE.RepeatWrapping; 
-    //     texture.wrapT = THREE.RepeatWrapping;
-
-    //     // how many times to repeat in each direction; the default is (1,1),
-    //     //   which is probably why your example wasn't working
-    //     texture.repeat.set( 4, 4 ); 
-
-    //     material = new THREE.MeshLambertMaterial({ map : texture });
-    //     plane = new THREE.Mesh(new THREE.PlaneGeometry(400, 3500), material);
-    //     plane.material.side = THREE.DoubleSide;
-    //     plane.position.x = 100;
-
-    //     // rotation.z is rotation around the z-axis, measured in radians (rather than degrees)
-    //     // Math.PI = 180 degrees, Math.PI / 2 = 90 degrees, etc.
-    //     plane.rotation.z = Math.PI / 2;
-
-    //     scene.add(plane);
-    // }    
+    } 
 
     // Load 3d object file 
       var file3d = props.obj3d;
@@ -256,15 +167,15 @@ function Workspace(props) {
       scene.add(light);
       scene.add(light.target);
     }
-    {
+    
       var axes = new THREE.AxisHelper(50);
       scene.add(axes);
-    }
-    {
+    
+    
       var gridXY = new THREE.GridHelper(100, 100);
       gridXY.rotateX(Math.PI / 2); 
       scene.add(gridXY);
-    }
+    
 
     // resize renderer to screen
     function resizeRendererToDisplaySize(renderer) {
@@ -411,10 +322,9 @@ function Workspace(props) {
     
   }
 
-  const [disabled, setDisabled] = useState(false);
+  const [disabled] = useState(false);
   const [checked, setChecked] = useState(true);
   const initRenderTrig = () => {
-    // setDisabled(true);
     initData();
     
     var data = { 
@@ -432,40 +342,13 @@ function Workspace(props) {
     })
     .then((response) => {
       console.log(response)
-      
       props.renderingStarted(noRenders);
-
-      // getProgressInterval = setInterval(() => {
-      //   getProgress()
-      // }, 2000);
 
     })
     .catch((error) => {
       console.log(error)
     })
   }
-
-  /*const getProgress = () => {
-    axios({
-      "method": "GET",
-      "url": "http://localhost:3001/getrenderprogress",
-      "headers": {
-        
-      }
-    })
-    .then((response) => {
-      var value = (parseInt(response.data) - 0) * 100 / (noRenders - 0);
-      setProgress(value);
-      // setProgress(parseInt(response.data))
-
-      if(parseInt(response.data)/noRenders >= 1){
-        clearInterval(getProgressInterval);
-      }
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-  }*/
 
   const initTrainTrig = () => {
     
