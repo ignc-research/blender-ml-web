@@ -170,8 +170,6 @@ function Workspace(props) {
     
       var axes = new THREE.AxisHelper(50);
       scene.add(axes);
-    
-    
       var gridXY = new THREE.GridHelper(100, 100);
       gridXY.rotateX(Math.PI / 2); 
       scene.add(gridXY);
@@ -267,20 +265,8 @@ function Workspace(props) {
     requestAnimationFrame(render);
   }
 
-  // console.log(camera.position.x);
-  // console.log(props.objParams.numberOfRenders);
-  // camera.up.set(0, 0, 1);
-  // var minSpherical = new Spherical();
-  // minSpherical.setFromCartesianCoords(camera.position.x, camera.position.y, objRadius);
-  // var minPhi = minSpherical.phi;
-  // var minTheta = minSpherical.theta;
-
-  // var maxSpherical = new Spherical();
-  // maxSpherical.setFromCartesianCoords(camera.position.x, camera.position.y, camera.position.z);
-  // var maxPhi = maxSpherical.phi;
-  // var maxTheta = maxSpherical.theta;
-
   const initData = () => {
+    //cartesian coordinates to Spherical coordinates system
     var minSpherical = new Spherical();
     minSpherical.setFromCartesianCoords(camera.position.x, camera.position.y, objRadius);
     var maxSpherical = new Spherical();
@@ -296,7 +282,6 @@ function Workspace(props) {
         ...props.objParams
     }
     console.log(data);
-    //Node API test
     axios({
       "method": "POST",
       "url": "http://localhost:3001/uploadcamdata",
@@ -372,7 +357,7 @@ function Workspace(props) {
       console.log(error)
     })
   }
-
+// Workspace UI elements
   return (
     <Slide direction="up" in={checked} mountOnEnter unmountOnExit>
     <div className="App">
@@ -416,8 +401,6 @@ function Workspace(props) {
             onClick={initTrainTrig} 
             variant="contained"
             color="default"
-            // disabled={React.state.disabled}
-            // className={classes.button}
             endIcon={<DoubleArrowIcon  />}
           >
           Start Training
